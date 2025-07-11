@@ -7,17 +7,22 @@
     <link rel="stylesheet" href="modern.css">
     <style>
         .viewer-container {
-            max-width: 100%;
+            max-width: 1000px;
+            width: 98vw;
             margin: 2rem auto;
             background: var(--surface);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
-            overflow: hidden;
+            overflow: visible;
+            padding: 0 1rem;
         }
 
         .viewer-header {
-            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1.2rem 1rem;
             background: var(--gradient-subtle);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -88,6 +93,15 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.875rem;
+            table-layout: fixed;
+        }
+
+        .data-table th, .data-table td {
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            white-space: pre-line;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
         }
 
         .data-table th {
@@ -176,8 +190,11 @@
         }
 
         .description-cell {
-            max-width: 300px;
+            max-width: 500px;
             line-height: 1.4;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            white-space: pre-line;
         }
 
         .date-cell {
@@ -212,23 +229,50 @@
             text-decoration: underline;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1400px) {
+            .viewer-container {
+                max-width: 98vw;
+            }
+            .description-cell {
+                max-width: 300px;
+            }
+        }
+        @media (max-width: 1100px) {
+            .viewer-container {
+                max-width: 98vw;
+                padding: 0 0.5rem;
+            }
+            .viewer-header {
+                padding: 1rem 0.5rem;
+            }
+            .data-table th, .data-table td {
+                font-size: 0.82rem;
+                padding-left: 0.25rem;
+                padding-right: 0.25rem;
+            }
+        }
+        @media (max-width: 900px) {
+            .description-cell {
+                max-width: 200px;
+            }
+        }
+        @media (max-width: 700px) {
+            .viewer-container {
+                max-width: 100vw;
+                margin: 0.5rem 0;
+                border-radius: 0;
+                box-shadow: none;
+                padding: 0;
+            }
             .viewer-header {
                 flex-direction: column;
                 align-items: stretch;
+                padding: 0.7rem 0.2rem;
             }
-
-            .viewer-controls {
-                justify-content: space-between;
-            }
-
-            .search-box {
-                min-width: auto;
-                flex: 1;
-            }
-
-            .description-cell {
-                max-width: 200px;
+            .data-table th, .data-table td {
+                font-size: 0.75rem;
+                padding-left: 0.1rem;
+                padding-right: 0.1rem;
             }
         }
     </style>
@@ -288,12 +332,6 @@
                                     <path d="M7 10l5 5 5-5"/>
                                 </svg>
                             </th>
-                            <th class="sortable" data-column="Description">
-                                Description
-                                <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M7 10l5 5 5-5"/>
-                                </svg>
-                            </th>
                             <th class="sortable" data-column="Published">
                                 Published
                                 <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -322,29 +360,29 @@
         <p>&copy; 2025 PatchThisApp. All rights reserved.</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script>
         let allData = [];
         let filteredData = [];
         let currentSort = { column: 'Published', direction: 'desc' };
 
-        // Load CSV data
+        // Load CSV data using PapaParse
         async function loadData() {
             try {
                 const response = await fetch('./data.csv');
                 if (!response.ok) {
                     throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
                 }
-                
                 const csvText = await response.text();
-                const data = parseCSV(csvText);
-                
-                allData = data;
-                filteredData = data;
-                
+                const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+                if (parsed.errors.length) {
+                    throw new Error('CSV Parse Error: ' + parsed.errors[0].message);
+                }
+                allData = parsed.data;
+                filteredData = parsed.data;
                 // Sort by Published date (newest first) by default
                 sortData('Published', 'desc');
                 updateSortIndicators();
-                
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('dataTable').style.display = 'table';
             } catch (error) {
@@ -352,44 +390,6 @@
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'block';
             }
-        }
-
-        // Simple CSV parser
-        function parseCSV(text) {
-            const lines = text.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim());
-            
-            return lines.slice(1).map(line => {
-                const values = parseCSVLine(line);
-                const row = {};
-                headers.forEach((header, index) => {
-                    row[header] = values[index] || '';
-                });
-                return row;
-            });
-        }
-
-        // Parse a single CSV line, handling quoted values
-        function parseCSVLine(line) {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-            
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === ',' && !inQuotes) {
-                    result.push(current.trim());
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            
-            result.push(current.trim());
-            return result;
         }
 
         // Sort data by column
@@ -480,13 +480,6 @@
                 const epss = parseFloat(row.EPSS || '0');
                 epssTd.textContent = epss > 0 ? epss.toFixed(3) : 'N/A';
                 tr.appendChild(epssTd);
-                
-                // Description
-                const descTd = document.createElement('td');
-                descTd.className = 'description-cell';
-                descTd.textContent = row.Description || '';
-                descTd.title = row.Description || '';
-                tr.appendChild(descTd);
                 
                 // Published
                 const dateTd = document.createElement('td');
