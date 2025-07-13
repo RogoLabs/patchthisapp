@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PatchThisApp - Data Viewer</title>
     <link rel="stylesheet" href="modern.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         .viewer-container {
             max-width: 1000px;
@@ -215,20 +216,6 @@
             color: var(--error);
         }
 
-        .back-link {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
         @media (max-width: 1400px) {
             .viewer-container {
                 max-width: 98vw;
@@ -278,86 +265,93 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <h1>PatchThisApp</h1>
-            <p class="subtitle">Data Viewer</p>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="index.html#home" class="nav-link"><span>🏠</span> Home</a>
+            <a href="viewer.html" class="nav-link"><span>📊</span> Dashboard</a>
+            <a href="index.html#sources" class="nav-link"><span>🔗</span> Sources</a>
+            <a href="index.html#about" class="nav-link"><span>💡</span> About</a>
+            <a href="index.html#contact" class="nav-link"><span>✉️</span> Contact</a>
+            <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="nav-link nav-link-external"><span>🌐</span> GitHub</a>
+        </div>
+    </nav>
+    <header class="hero-section card" id="dashboard-hero">
+        <div class="hero-content">
+            <h1 class="main-title">PatchThisApp</h1>
+            <p class="subtitle">Vulnerability Data Dashboard</p>
+            <p class="hero-description">Explore, search, and analyze the latest vulnerability intelligence. Use the dashboard below to filter, sort, and download real-time vulnerability data from trusted sources.</p>
         </div>
     </header>
-
     <main>
-        <a href="../index.html" class="back-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m15 18-6-6 6-6"/>
-            </svg>
-            Back to Overview
-        </a>
-
-        <div class="viewer-container">
-            <div class="viewer-header">
-                <h2 class="viewer-title">Vulnerability Data</h2>
-                <div class="viewer-controls">
-                    <input type="text" id="searchInput" class="search-box" placeholder="Search CVEs, descriptions...">
-                    <a href="../data.csv" download="patchthisapp-data.csv" class="btn-download">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7,10 12,15 17,10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        Download CSV
-                    </a>
+        <div class="card-section">
+            <div class="viewer-container">
+                <div class="viewer-header">
+                    <h2 class="viewer-title">Vulnerability Data</h2>
+                    <div class="viewer-controls">
+                        <input type="text" id="searchInput" class="search-box" placeholder="Search CVEs, descriptions...">
+                        <a href="../data.csv" download="patchthisapp-data.csv" class="btn-download">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Download CSV
+                        </a>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="table-container">
-                <div id="loadingMessage" class="loading">Loading vulnerability data...</div>
-                <table id="dataTable" class="data-table" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th class="sortable" data-column="CVE">
-                                CVE
-                                <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M7 10l5 5 5-5"/>
-                                </svg>
-                            </th>
-                            <th class="sortable" data-column="CVSS Score">
-                                CVSS Score
-                                <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M7 10l5 5 5-5"/>
-                                </svg>
-                            </th>
-                            <th class="sortable" data-column="EPSS">
-                                EPSS
-                                <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M7 10l5 5 5-5"/>
-                                </svg>
-                            </th>
-                            <th class="sortable" data-column="Published">
-                                Published
-                                <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M7 10l5 5 5-5"/>
-                                </svg>
-                            </th>
-                            <th class="sortable" data-column="Source">
-                                Source
-                                <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M7 10l5 5 5-5"/>
-                                </svg>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                    </tbody>
-                </table>
-                <div id="errorMessage" class="error" style="display: none;">
-                    Failed to load vulnerability data. Please try again later.
+                
+                <div class="table-container">
+                    <div id="loadingMessage" class="loading">Loading vulnerability data...</div>
+                    <table id="dataTable" class="data-table" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-column="CVE">
+                                    CVE
+                                    <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M7 10l5 5 5-5"/>
+                                    </svg>
+                                </th>
+                                <th class="sortable" data-column="CVSS Score">
+                                    CVSS Score
+                                    <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M7 10l5 5 5-5"/>
+                                    </svg>
+                                </th>
+                                <th class="sortable" data-column="EPSS">
+                                    EPSS
+                                    <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M7 10l5 5 5-5"/>
+                                    </svg>
+                                </th>
+                                <th class="sortable" data-column="Published">
+                                    Published
+                                    <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M7 10l5 5 5-5"/>
+                                    </svg>
+                                </th>
+                                <th class="sortable" data-column="Source">
+                                    Source
+                                    <svg class="sort-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M7 10l5 5 5-5"/>
+                                    </svg>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                    <div id="errorMessage" class="error" style="display: none;">
+                        Failed to load vulnerability data. Please try again later.
+                    </div>
                 </div>
             </div>
         </div>
     </main>
-
     <footer>
-        <p>&copy; 2025 PatchThisApp. All rights reserved.</p>
+        <div class="footer-content">
+            <span>&copy; 2025 RogoLabs. All rights reserved.</span>
+            <span class="footer-meta">v1.0 | <a href="https://rogolabs.net/" target="_blank">RogoLabs</a></span>
+        </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>

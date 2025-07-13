@@ -133,9 +133,9 @@ nav {
 
 /* Main Content */
 main {
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 0;
 }
 
 /* Hero Section */
@@ -393,6 +393,115 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Card Section and Card Styles */
+.card, .feature-section.card, .about-section.card, .contact-section.card, .hero-section.card {
+  text-align: left;
+  background: var(--surface);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+  padding: 2.5rem 2rem;
+  margin: 0 0 2.5rem 0;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  margin: 2rem 0;
+}
+
+@media (max-width: 950px) {
+  main {
+    max-width: 100vw;
+    padding: 0 0.5rem;
+  }
+  .card, .feature-section.card, .about-section.card, .contact-section.card, .hero-section.card {
+    padding: 2rem 0.5rem;
+  }
+}
+
+/* Intelligence Grid Layout Fix */
+.intelligence-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: 2.5rem 0;
+}
+
+.intelligence-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  background: var(--surface);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  padding: 1.5rem 2rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  text-align: left;
+}
+
+.intelligence-card > div {
+  text-align: left;
+}
+
+.card, .feature-section.card, .about-section.card, .contact-section.card {
+  text-align: left;
+}
+
+.intelligence-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.intelligence-card .feature-icon {
+  font-size: 2.2rem;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.intelligence-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.intelligence-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.center-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+.center-meta span {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 700px) {
+  .intelligence-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem 1rem;
+  }
+  .intelligence-card .feature-icon {
+    margin-bottom: 0.5rem;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   header {
@@ -468,4 +577,8 @@ a:hover {
   .stat-item {
     padding: 1rem;
   }
+}
+
+.hero-section.card, .hero-content, .hero-section.card * {
+  text-align: left !important;
 }
