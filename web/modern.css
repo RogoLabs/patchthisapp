@@ -7,6 +7,7 @@
   --primary-dark: #004499;
   --secondary: #6366f1;
   --accent: #f59e0b;
+  --neutral: #fafbfc;
   --background: #fafbfc;
   --surface: #ffffff;
   --text-primary: #1f2937;
@@ -25,6 +26,20 @@
   --border-radius: 12px;
   --border-radius-sm: 8px;
   --border-radius-lg: 16px;
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-size-base: 1rem;
+  --font-size-h1: 2.5rem;
+  --font-size-h2: 2rem;
+  --font-size-h3: 1.25rem;
+  --font-size-h4: 1.125rem;
+  --font-size-caption: 0.875rem;
+  --line-height-base: 1.6;
+  --line-height-heading: 1.2;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  --spacing-lg: 3rem;
+  --spacing-xl: 4rem;
 }
 
 * {
@@ -32,14 +47,63 @@
 }
 
 html, body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
   background: var(--background);
   color: var(--text-primary);
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
-  line-height: 1.6;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+h1, .main-title {
+  font-size: var(--font-size-h1);
+  font-weight: 700;
+  line-height: var(--line-height-heading);
+  letter-spacing: -0.025em;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--spacing-sm);
+}
+h2 {
+  font-size: var(--font-size-h2);
+  font-weight: 700;
+  line-height: var(--line-height-heading);
+  margin-bottom: var(--spacing-xs);
+}
+h3 {
+  font-size: var(--font-size-h3);
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+h4 {
+  font-size: var(--font-size-h4);
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+p, ul, ol {
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+.subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin-bottom: var(--spacing-md);
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  max-width: 600px;
+}
+
+.hero-description, .section-intro {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
 }
 
 /* Header Styles */
@@ -99,8 +163,7 @@ nav {
 .nav-container {
   display: flex;
   justify-content: center;
-  gap: 0;
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -108,15 +171,15 @@ nav {
   color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
-  padding: 1rem 1.5rem;
-  transition: all 0.2s ease;
+  padding: var(--spacing-sm) var(--spacing-md);
   border-bottom: 2px solid transparent;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: all 0.2s;
 }
 
-.nav-link:hover {
+.nav-link:hover, .nav-link:focus {
   color: var(--primary);
   border-bottom-color: var(--primary);
   background: var(--border-light);
@@ -133,9 +196,9 @@ nav {
 
 /* Main Content */
 main {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 0;
+  padding: 0 2rem;
 }
 
 /* Hero Section */
@@ -163,7 +226,7 @@ main {
 }
 
 .hero-description {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   color: var(--text-secondary);
   margin: 0 0 3rem 0;
   line-height: 1.7;
@@ -176,7 +239,7 @@ main {
   flex-wrap: wrap;
 }
 
-.btn {
+.btn, .btn-primary, .btn-secondary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -185,19 +248,18 @@ main {
   text-decoration: none;
   font-weight: 600;
   font-size: 1rem;
-  transition: all 0.2s ease;
   border: 2px solid transparent;
+  transition: all 0.2s;
 }
 
 .btn-primary {
   background: var(--primary);
-  color: white;
+  color: #fff;
   box-shadow: var(--shadow-md);
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .btn-primary:focus {
   background: var(--primary-dark);
-  transform: translateY(-1px);
   box-shadow: var(--shadow-lg);
 }
 
@@ -207,7 +269,7 @@ main {
   border-color: var(--border);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover, .btn-secondary:focus {
   background: var(--border-light);
   border-color: var(--primary);
 }
@@ -388,40 +450,36 @@ a {
   transition: color 0.2s ease;
 }
 
-a:hover {
+a:hover, a:focus {
   color: var(--primary-dark);
   text-decoration: underline;
 }
 
 /* Card Section and Card Styles */
 .card, .feature-section.card, .about-section.card, .contact-section.card, .hero-section.card {
-  text-align: left;
   background: var(--surface);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
-  padding: 2.5rem 2rem;
-  margin: 0 0 2.5rem 0;
+  padding: var(--spacing-lg) var(--spacing-md);
+  margin: 0 auto var(--spacing-lg) auto;
+  max-width: 900px;
   width: 100%;
   box-sizing: border-box;
-  max-width: 100%;
 }
-
 .card-section {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
-  margin: 2rem 0;
+  gap: var(--spacing-lg);
+  margin: var(--spacing-md) 0;
 }
 
-@media (max-width: 950px) {
-  main {
-    max-width: 100vw;
-    padding: 0 0.5rem;
-  }
-  .card, .feature-section.card, .about-section.card, .contact-section.card, .hero-section.card {
-    padding: 2rem 0.5rem;
-  }
+ul, ol {
+  padding-left: 2rem;
+  margin-bottom: var(--spacing-xs);
+}
+li {
+  margin-bottom: 0.5rem;
 }
 
 /* Intelligence Grid Layout Fix */
@@ -489,6 +547,13 @@ a:hover {
 .center-meta span {
   font-size: 1rem;
   color: var(--text-secondary);
+}
+
+@media (max-width: 950px) {
+  .card, .feature-section.card, .about-section.card, .contact-section.card, .hero-section.card {
+    max-width: 100%;
+    padding: 2rem 0.5rem;
+  }
 }
 
 @media (max-width: 700px) {
@@ -579,6 +644,43 @@ a:hover {
   }
 }
 
+/* Remove forced left alignment for all text inside cards, except where needed */
 .hero-section.card, .hero-content, .hero-section.card * {
-  text-align: left !important;
+  text-align: inherit !important;
 }
+
+.card, .feature-section.card, .about-section.card, .contact-section.card, .hero-section.card {
+  text-align: inherit;
+}
+
+/* For .card-section and .card, use default text alignment (left for LTR, but allow override) */
+.card-section, .card {
+  text-align: initial;
+}
+
+/* If you want to center only specific elements, add a class or selector for those */
+
+/* Make hero-section and hero-content match other cards' padding and alignment */
+.hero-section.card {
+  padding: var(--spacing-lg) var(--spacing-md) !important;
+  margin: 0 auto var(--spacing-lg) auto;
+  max-width: 900px;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.hero-content {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.hero-section.card * {
+  text-align: left;
+}
+
+/* Remove previous centering and extra padding for hero-section */
