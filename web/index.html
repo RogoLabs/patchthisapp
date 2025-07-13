@@ -5,117 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PatchThisApp</title>
     <link rel="stylesheet" href="modern.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <h1>PatchThisApp</h1>
-            <p class="subtitle">Vlnerability Prioritization Intelligence Information</p>
-            <div class="header-stats">
-                <span class="stat">Real-time Intelligence</span>
-                <span class="stat">RogoLabs Project</span>
-            </div>
-        </div>
-    </header>
-    <nav>
+    <nav class="main-nav">
         <div class="nav-container">
-            <a href="#welcome" class="nav-link">Overview</a>
-            <a href="#about" class="nav-link">About</a>
-            <a href="#contact" class="nav-link">Contact</a>
-            <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="nav-link nav-link-external">
-                <span>GitHub</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                    <polyline points="15,3 21,3 21,9"></polyline>
-                    <line x1="10" y1="14" x2="21" y2="3"></line>
-                </svg>
-            </a>
+            <a href="#home" class="nav-link"><span>🏠</span> Home</a>
+            <a href="viewer.html" class="nav-link"><span>📊</span> Dashboard</a>
+            <a href="#sources" class="nav-link"><span>🔗</span> Sources</a>
+            <a href="#about" class="nav-link"><span>💡</span> About</a>
+            <a href="#contact" class="nav-link"><span>✉️</span> Contact</a>
+            <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="nav-link nav-link-external"><span>🌐</span> GitHub</a>
         </div>
     </nav>
+    <header class="hero-section card" id="home">
+        <div class="hero-content">
+            <h1 class="main-title">PatchThisApp</h1>
+            <p class="subtitle">Vulnerability Prioritization Intelligence Platform</p>
+            <p class="hero-description">PatchThisApp integrates with industry-leading vulnerability intelligence sources, delivering real-time, actionable data to help you prioritize and respond to the threats that matter most. Our platform is designed for security teams who demand clarity, speed, and reliability in vulnerability management.</p>
+        </div>
+    </header>
     <main>
-        <section id="welcome" class="hero-section">
-            <div class="hero-content">
-                <h2>Strategic Vulnerability Management</h2>
-                <p class="hero-description">Transform your security posture with intelligent vulnerability prioritization. PatchThisApp delivers actionable intelligence by aggregating and analyzing the most critical vulnerability data sources, enabling security teams to focus on threats that matter most.</p>
-                <div class="cta-buttons">
-                    <a href="viewer.html" class="btn btn-primary">View Intelligence Dashboard</a>
-                    <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="btn btn-secondary">Explore on GitHub</a>
-                </div>
-            </div>
-        </section>
-        
-        <section class="data-sources">
-            <h2>Enterprise Intelligence Sources</h2>
-            <p class="section-intro">Our platform integrates with industry-leading vulnerability intelligence sources, providing comprehensive coverage and real-time updates for informed security decisions.</p>
-            <div class="sources-grid">
-                <div class="source-card">
-                    <div class="source-icon">🛡️</div>
-                    <h3><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank">CISA KEV Catalog</a></h3>
-                    <p>Known Exploited Vulnerabilities actively targeted by threat actors in the wild.</p>
-                </div>
-                <div class="source-card">
-                    <div class="source-icon">⚡</div>
-                    <h3><a href="https://docs.rapid7.com/metasploit/modules/" target="_blank">Rapid7 Metasploit</a></h3>
-                    <p>Battle-tested exploit modules used by security professionals worldwide.</p>
-                </div>
-                <div class="source-card">
-                    <div class="source-icon">🔍</div>
-                    <h3><a href="https://github.com/projectdiscovery/nuclei-templates" target="_blank">Nuclei Templates</a></h3>
-                    <p>Community-driven vulnerability detection templates for automated scanning.</p>
-                </div>
-                <div class="source-card">
-                    <div class="source-icon">📊</div>
-                    <h3><a href="https://www.first.org/epss/" target="_blank">EPSS Scoring</a></h3>
-                    <p>Machine learning-driven exploit prediction scores for data-driven prioritization and resource allocation.</p>
-                </div>
-            </div>
-        </section>
-        
-        <section id="about" class="about-section">
-            <h2>Powered by RogoLabs</h2>
-            <div class="about-content">
-                <div class="about-text">
-                    <p><strong>PatchThisApp</strong> is now a <a href="https://rogolabs.net/" target="_blank">RogoLabs</a> project, bringing enterprise-grade vulnerability intelligence to security teams worldwide. Originally created by <a href="https://www.jerrygamblin.com" target="_blank">Jerry Gamblin</a>, this platform addresses the critical challenge of vulnerability prioritization in an era of information overload.</p>
-                    <p>Our mission is to provide security professionals with the tools and intelligence needed to make informed, strategic decisions about vulnerability management and remediation efforts.</p>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <span class="stat-number">24/7</span>
-                        <span class="stat-label">Intelligence</span>
+        <div class="card-section">
+            <section id="sources" class="feature-section card">
+                <h2>PatchThisApp Intelligence Sources</h2>
+                <div class="features-grid intelligence-grid">
+                    <div class="feature-card intelligence-card">
+                        <div class="feature-icon">🛡️</div>
+                        <div>
+                            <h3><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank">CISA KEV Catalog</a></h3>
+                            <p>Live feed of known exploited vulnerabilities actively targeted in the wild.</p>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-number">4+</span>
-                        <span class="stat-label">Data Sources</span>
+                    <div class="feature-card intelligence-card">
+                        <div class="feature-icon">⚡</div>
+                        <div>
+                            <h3><a href="https://docs.rapid7.com/metasploit/modules/" target="_blank">Rapid7 Metasploit</a></h3>
+                            <p>Battle-tested exploit modules for real-world attack simulation and validation.</p>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-number">100%</span>
-                        <span class="stat-label">Open Source</span>
+                    <div class="feature-card intelligence-card">
+                        <div class="feature-icon">🔍</div>
+                        <div>
+                            <h3><a href="https://github.com/projectdiscovery/nuclei-templates" target="_blank">Nuclei Templates</a></h3>
+                            <p>Community-driven detection templates for automated, scalable vulnerability scanning.</p>
+                        </div>
+                    </div>
+                    <div class="feature-card intelligence-card">
+                        <div class="feature-icon">📊</div>
+                        <div>
+                            <h3><a href="https://www.first.org/epss/" target="_blank">EPSS Scoring</a></h3>
+                            <p>Machine learning-driven exploit prediction scores for smarter, data-driven prioritization.</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        
-        <section id="contact" class="contact-section">
-            <h2>Connect with RogoLabs</h2>
-            <p>Join our community of security professionals and contribute to the future of vulnerability intelligence and management.</p>
-            <div class="contact-links">
-                <a href="https://github.com/RogoLabs/patchthisapp/issues" target="_blank" class="contact-link">
-                    <span class="contact-icon">💬</span>
-                    <span>Report Issues</span>
-                </a>
-                <a href="https://rogolabs.net/" target="_blank" class="contact-link">
-                    <span class="contact-icon">🌐</span>
-                    <span>Visit RogoLabs</span>
-                </a>
-                <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="contact-link">
-                    <span class="contact-icon">⭐</span>
-                    <span>Star on GitHub</span>
-                </a>
-            </div>
-        </section>
+                <div class="feature-meta center-meta">
+                    <span>🔄 Updated every 6 hours</span>
+                    <span>📅 Data from last 6 months</span>
+                    <span>🔗 <a href="https://rogolabs.net/" target="_blank">RogoLabs</a> Project</span>
+                </div>
+            </section>
+            <section id="about" class="about-section card">
+                <h2>About PatchThisApp</h2>
+                <div class="about-content">
+                    <p><strong>PatchThisApp</strong> is a <a href="https://rogolabs.net/" target="_blank">RogoLabs</a> project, delivering enterprise-grade vulnerability intelligence to security teams worldwide. Originally created by <a href="https://www.jerrygamblin.com" target="_blank">Jerry Gamblin</a>, this platform addresses the challenge of vulnerability prioritization in an era of information overload.</p>
+                    <ul class="about-list">
+                        <li>✅ 24/7 Real-time Intelligence</li>
+                        <li>✅ 4+ Data Sources Integrated</li>
+                        <li>✅ 100% Open Source</li>
+                    </ul>
+                </div>
+            </section>
+            <section id="contact" class="contact-section card">
+                <h2>Contact & Community</h2>
+                <div class="contact-links">
+                    <a href="https://github.com/RogoLabs/patchthisapp/issues" target="_blank" class="contact-link">💬 Report Issues</a>
+                    <a href="https://rogolabs.net/" target="_blank" class="contact-link">🌐 Visit RogoLabs</a>
+                    <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="contact-link">⭐ Star on GitHub</a>
+                </div>
+            </section>
+        </div>
     </main>
     <footer>
-        <p>&copy; 2025 RogoLabs. All rights reserved.</p>
+        <div class="footer-content">
+            <span>&copy; 2025 RogoLabs. All rights reserved.</span>
+            <span class="footer-meta">v1.0 | <a href="https://rogolabs.net/" target="_blank">RogoLabs</a></span>
+        </div>
     </footer>
 </body>
 </html>
