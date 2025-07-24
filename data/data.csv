@@ -7134,6 +7134,7 @@ This web interface has two endpoints that are vulnerable to arbitrary command in
 Remote unauthenticated attackers can gain arbitrary command execution with elevated privileges ( root ) on affected devices.
 
 This level of access could lead to serious business impact such as the interruption of media streaming, modification of media being streamed, alteration of closed captions being generated, among others.",2025-05-28 07:15:24.490,Nuclei
+CVE-2025-40630,0.0,0.00061,"Open redirection vulnerability in IceWarp Mail Server affecting version 11.4.0. This vulnerability allows an attacker to redirect a user to any domain by sending a malicious URL to the victim, for example “ https://icewarp.domain.com//<MALICIOUS_DOMAIN>/%2e%2e” https://icewarp.domain.com///%2e%2e” . This vulnerability has been tested in Firefox.",2025-05-16 11:15:44.763,Nuclei
 CVE-2025-4123,7.6,0.01231,"A cross-site scripting (XSS) vulnerability exists in Grafana caused by combining a client path traversal and open redirect. This allows attackers to redirect users to a website that hosts a frontend plugin that will execute arbitrary JavaScript. This vulnerability does not require editor permissions and if anonymous access is enabled, the XSS will work. If the Grafana Image Renderer plugin is installed, it is possible to exploit the open redirect to achieve a full read SSRF.
 
 The default Content-Security-Policy (CSP) in Grafana will block the XSS though the `connect-src` directive.",2025-05-22 08:15:52.720,Nuclei
