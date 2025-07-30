@@ -5642,7 +5642,7 @@ process itself. Gaining access to that database should
 
 This vulnerability impacts Apache Superset versions 1.5.0 up to and including 2.1.0. Users are recommended to upgrade to version 2.1.1 or later.",2023-09-06 14:15:10.483,Metasploit
 CVE-2023-37979,7.1,0.45008,Unauth. Reflected Cross-Site Scripting (XSS) vulnerability in Saturday Drive Ninja Forms Contact Form plugin <= 3.6.25 versions.,2023-07-27 15:15:11.507,Nuclei
-CVE-2023-38035,9.8,0.94435,"A security vulnerability in MICS Admin Portal in Ivanti MobileIron Sentry versions 9.18.0 and below, which may allow an attacker to bypass authentication controls on the administrative interface due to an insufficiently restrictive Apache HTTPD configuration. ",2023-08-21 17:15:47.457,Metasploit/Nuclei/CISA
+CVE-2023-38035,9.8,0.94435,"A security vulnerability in MICS Admin Portal in Ivanti MobileIron Sentry versions 9.18.0 and below, which may allow an attacker to bypass authentication controls on the administrative interface due to an insufficiently restrictive Apache HTTPD configuration.",2023-08-21 17:15:47.457,Metasploit/Nuclei/CISA
 CVE-2023-38040,6.1,0.05715,A reflected XSS vulnerability exists in Revive Adserver 5.4.1 and earlier versions..,2023-09-17 05:15:10.213,Nuclei
 CVE-2023-38096,9.8,0.70655,"NETGEAR ProSAFE Network Management System MyHandlerInterceptor Authentication Bypass Vulnerability. This vulnerability allows remote attackers to bypass authentication on affected installations of NETGEAR ProSAFE Network Management System. Authentication is not required to exploit this vulnerability.
 
