@@ -7288,8 +7288,6 @@ CVE-2025-6934,9.8,0.00054,"The Opal Estate Pro – Property Management and Submi
 CVE-2025-6970,7.5,0.15686,"The Events Manager – Calendar, Bookings, Tickets, and more! plugin for WordPress is vulnerable to time-based SQL Injection via the ‘orderby’ parameter in all versions up to, and including, 7.0.3 due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query.  This makes it possible for unauthenticated attackers to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database.",2025-07-09 23:15:24.713,Nuclei
 CVE-2025-8088,8.8,0.32406,"A path traversal vulnerability affecting the Windows version of WinRAR allows the attackers to execute arbitrary code by crafting malicious archive files. This vulnerability was exploited in the wild and was discovered by Anton Cherepanov, Peter Košinár, and Peter Strýček
      from ESET.",2025-08-08 12:15:29.343,CISA
-CVE-2025-8286,9.8,0.10322,"Güralp FMUS series seismic monitoring devices expose an unauthenticated Telnet-based command line interface that 
-could allow an attacker to modify hardware configurations, manipulate 
-data, or factory reset the device.",2025-07-31 20:15:46.350,Nuclei
+CVE-2025-8286,0.0,0.10322,"The affected products expose an unauthenticated Telnet-based command line interface that could allow an attacker to modify hardware configurations, manipulate data, or factory reset the device.",2025-07-31 20:15:46.350,Nuclei
 CVE-2025-8875,7.8,0.10122,Deserialization of Untrusted Data vulnerability in N-able N-central allows Local Execution of Code.This issue affects N-central: before 2025.3.1.,2025-08-14 15:15:43.020,CISA
 CVE-2025-8876,8.8,0.17307,Improper Input Validation vulnerability in N-able N-central allows OS Command Injection.This issue affects N-central: before 2025.3.1.,2025-08-14 15:15:43.170,CISA
