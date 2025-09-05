@@ -7377,7 +7377,7 @@ CVE-2025-8088,8.8,0.06947,"A path traversal vulnerability affecting the Windows 
 CVE-2025-8286,0.0,0.01642,"The affected products expose an unauthenticated Telnet-based command line interface that could allow an attacker to modify hardware configurations, manipulate data, or factory reset the device.",2025-07-31 20:15:46.350,Nuclei
 CVE-2025-8875,7.8,0.11731,Deserialization of Untrusted Data vulnerability in N-able N-central allows Local Execution of Code.This issue affects N-central: before 2025.3.1.,2025-08-14 15:15:43.020,CISA
 CVE-2025-8876,8.8,0.23465,Improper Input Validation vulnerability in N-able N-central allows OS Command Injection.This issue affects N-central: before 2025.3.1.,2025-08-14 15:15:43.170,CISA
-CVE-2025-9377,0.0,0.237,"The authenticated remote command execution (RCE) vulnerability exists  in the Parental Control page on TP-Link Archer C7(EU) V2 and TL-WR841N/ND(MS) V9.
+CVE-2025-9377,7.2,0.237,"The authenticated remote command execution (RCE) vulnerability exists  in the Parental Control page on TP-Link Archer C7(EU) V2 and TL-WR841N/ND(MS) V9.
 
 This issue affects Archer C7(EU) V2: before 241108 and TL-WR841N/ND(MS) V9: before 241108.
 
