@@ -7235,6 +7235,7 @@ CVE-2025-34510,8.8,0.78126,"Sitecore Experience Manager (XM), Experience Platfor
 CVE-2025-34511,8.8,0.77915,"Sitecore PowerShell Extensions, an add-on to Sitecore Experience Manager (XM) and Experience Platform (XP), through version 7.0 is vulnerable to an unrestricted file upload issue. A remote, authenticated attacker can upload arbitrary files to the server using crafted HTTP requests, resulting in remote code execution.",2025-06-17 19:15:31.683,Metasploit
 CVE-2025-3515,8.1,0.04423,"The Drag and Drop Multiple File Upload for Contact Form 7 plugin for WordPress is vulnerable to arbitrary file uploads due to insufficient file type validation in all versions up to, and including, 1.3.8.9. This makes it possible for unauthenticated attackers to bypass the plugin's blacklist and upload .phar or other dangerous file types on the affected site's server, which may make remote code execution possible on the servers that are configured to handle .phar files as executable PHP scripts, particularly in default Apache+mod_php configurations where the file extension is not strictly validated before being passed to the PHP interpreter.",2025-06-17 10:15:23.507,Nuclei
 CVE-2025-35939,5.3,0.40503,"Craft CMS stores arbitrary content provided by unauthenticated users in session files. This content could be accessed and executed, possibly using an independent vulnerability. Craft CMS redirects requests that require authentication to the login page and generates a session file on the server at '/var/lib/php/sessions'. Such session files are named 'sess_[session_value]', where '[session_value]' is provided to the client in a 'Set-Cookie' response header. Craft CMS stores the return URL requested by the client without sanitizing parameters. Consequently, an unauthenticated client can introduce arbitrary values, such as PHP code, to a known local file location on the server. Craft CMS versions 5.7.5 and 4.15.3 have been released to address this issue.",2025-05-07 23:15:54.103,CISA
+CVE-2025-3605,9.8,0.03359,"The Frontend Login and Registration Blocks plugin for WordPress is vulnerable to privilege escalation via account takeover in all versions up to, and including, 1.0.7. This is due to the plugin not properly validating a user's identity prior to updating their details like email via the flr_blocks_user_settings_handle_ajax_callback() function. This makes it possible for unauthenticated attackers to change arbitrary user's email addresses, including administrators, and leverage that to reset the user's password and gain access to their account.",2025-05-09 07:16:10.570,Nuclei
 CVE-2025-38352,7.4,0.04243,"In the Linux kernel, the following vulnerability has been resolved:
 
 posix-cpu-timers: fix race between handle_posix_cpu_timers() and posix_cpu_timer_del()
@@ -7269,10 +7270,13 @@ CVE-2025-4008,0.0,0.03526,"The Meteobridge web interface let meteobridge adminis
 This web interface exposes an endpoint that is vulnerable to command injection.
 
 Remote unauthenticated attackers can gain arbitrary command execution with elevated privileges ( root ) on affected devices.",2025-05-21 16:15:33.987,Nuclei
-CVE-2025-4009,0.0,0.07766,"The Evertz SDVN 3080ipx-10G is a High Bandwidth Ethernet Switching Fabric for Video Application. This device exposes a web management interface on port 80. This web management interface can be used by administrators to control product
-features, setup network switching, and register license among other features. The application has been developed in PHP with the webEASY SDK, also named ‘ewb’ by Evertz.
+CVE-2025-4009,0.0,0.07766,"The Evertz SDVN 3080ipx-10G is a High Bandwidth Ethernet Switching Fabric for Video Application. This device exposes a web management interface on port 80. This web management interface can be used by administrators to control product
+features, setup network switching, and register license among other features. The application has been developed in PHP with the webEASY SDK, also named ‘ewb’ by Evertz.
 
-This web interface has two endpoints that are vulnerable to arbitrary command injection and the authentication mechanism has a flaw leading to authentication bypass.
+This web interface has two endpoints that are vulnerable to arbitrary command injection (CVE-2025-4009, CVE-2025-10364) and the authentication mechanism has a flaw leading to authentication bypass (CVE-2025-10365).
+
+CVE-2025-4009 covers the command injection in feature-transfer-import.php
+CVE-2025-10364 covers the command injection in feature-transfer-export.php
 
 Remote unauthenticated attackers can gain arbitrary command execution with elevated privileges ( root ) on affected devices.
 
