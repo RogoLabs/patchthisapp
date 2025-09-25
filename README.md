@@ -80,6 +80,7 @@ Our platform integrates data from the most trusted vulnerability intelligence so
 
 ## 📖 Documentation
 
+
 ### Project Structure
 
 ```
@@ -93,6 +94,9 @@ patchthisapp/
 │   └── 📄 data.csv            # Generated vulnerability data
 ├── 📁 data/                   # Raw data sources
 │   └── 📄 data.csv            # Processed vulnerability dataset
+├── 📁 scripts/                # Helper scripts for data and analysis
+│   ├── 📄 local_data.py       # Download all required data for local testing
+│   └── 📄 column_summary.py   # Print summary stats for key columns
 └── 📄 README.md               # This file
 ```
 
@@ -106,6 +110,11 @@ The `patchthisapp.py` script is the heart of our intelligence platform:
 - 📊 **Intelligent Scoring**: Applies EPSS and CVSS scoring for prioritization
 - 📈 **Export Capabilities**: Generates CSV and JSON outputs
 - 🔍 **Error Handling**: Robust error management and logging
+
+**New Columns:**
+- `Vendor`: The primary vendor associated with the vulnerability (from NVD CPE data)
+- `Affected Products`: The main affected product(s) (from NVD CPE data)
+- `CVSS_Vector`: The CVSS attack vector (e.g., NETWORK, ADJACENT, LOCAL)
 
 **Usage:**
 ```bash
@@ -145,36 +154,49 @@ Our modern web interface provides:
 ## 🔧 API & Data Formats
 
 ### CSV Export
+
 The generated `data.csv` includes:
 - `CVE`: CVE identifier
 - `CVSS Score`: Severity score (0.0-10.0)
+- `CVSS_Vector`: CVSS attack vector (e.g., NETWORK, ADJACENT, LOCAL)
 - `EPSS`: Exploit prediction score (0.0-1.0)
 - `Description`: Vulnerability description
 - `Published`: Publication date
 - `Source`: Data source attribution
+- `Vendor`: Primary vendor (from NVD CPE)
+- `Affected Products`: Main affected product(s) (from NVD CPE)
 
 ### JSON API
-```json
-{
-  "cve": "CVE-2024-XXXX",
-  "cvss_score": 9.8,
-  "epss_score": 0.97,
-  "description": "Critical vulnerability description",
-  "published": "2024-01-15",
-  "sources": ["CISA", "Metasploit"]
-}
+
+### Data Processing Engine
+
+The `patchthisapp.py` script is the heart of our intelligence platform.
+
+**Usage:**
+```bash
+# Basic usage
+python patchthisapp.py
+
+# With custom output directory
+python patchthisapp.py --output-dir /path/to/output
+
+# Verbose logging
+python patchthisapp.py --verbose
 ```
 
-## 🛠️ Configuration
+### Helper Scripts
 
-### Environment Variables
+**Download all required data for local testing:**
 ```bash
-# Optional: Custom data source URLs
-export CISA_KEV_URL="https://www.cisa.gov/sites/default/files/csv/known_exploited_vulnerabilities.csv"
-export EPSS_URL="https://epss.cyentia.com/epss_scores-current.csv.gz"
+python scripts/local_data.py
+```
+This will fetch the latest NVD, CISA KEV, Metasploit, Nuclei, and EPSS data. Supports macOS and Linux.
 
-# Optional: Update frequency (hours)
-export UPDATE_FREQUENCY=24
+**Print summary statistics for Vendor, Affected Products, and CVSS_Vector columns:**
+```bash
+python scripts/column_summary.py
+```
+This will print counts, unique values, and top values for the new columns in `data/data.csv`.
 ```
 
 ### Custom Data Sources
