@@ -104,14 +104,12 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
         'impact_score': 'Missing_Data',
         'cwe': 'Missing_Data',
         'description': '',
-        'affected_products': '',
-        'vendor': '',
-    'cvss_vector': ''
+        'cpe': '',
+        'cvss_vector': ''
     }
-    # Extract affected products from CPEs (if present)
+    # Extract CPEs (if present)
     try:
         cpe_list = []
-        vendor_list = []
         configurations = entry.get('cve', {}).get('configurations', [])
         for config in configurations:
             nodes = config.get('nodes', [])
@@ -120,21 +118,11 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
                 for cpe in cpe_matches:
                     cpe_uri = cpe.get('criteria') or cpe.get('cpe23Uri')
                     if cpe_uri:
-                        # CPE format: cpe:2.3:a:vendor:product:version:*
-                        parts = cpe_uri.split(':')
-                        if len(parts) >= 5:
-                            product = parts[4]
-                            vendor = parts[3]
-                            cpe_list.append(f"{vendor}:{product}")
-                            vendor_list.append(vendor)
-                        else:
-                            cpe_list.append(cpe_uri)
+                        cpe_list.append(cpe_uri)
         if cpe_list:
-            fields['affected_products'] = ';'.join(sorted(set(cpe_list)))
-        if vendor_list:
-            fields['vendor'] = ';'.join(sorted(set(vendor_list)))
+            fields['cpe'] = ';'.join(sorted(set(cpe_list)))
     except Exception as e:
-        logging.warning(f"Error extracting affected products/vendors: {e}")
+        logging.warning(f"Error extracting CPEs: {e}")
     
     try:
         cve_data = entry.get('cve', {})
@@ -164,7 +152,7 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
                 'base_severity': cvss_data.get('baseSeverity', fields['base_severity']),
                 'exploitability_score': str(cvss_data.get('exploitabilityScore', fields['exploitability_score'])),
                 'impact_score': str(cvss_data.get('impactScore', fields['impact_score'])),
-                'cvss_vector': cvss_data.get('attackVector', fields['cvss_vector'])
+                'cvss_vector': cvss_data.get('vectorString', cvss_data.get('attackVector', fields['cvss_vector']))
             })
         
         # Extract CWE information
@@ -210,7 +198,7 @@ def process_nvd_files(nvd_path: Path) -> pd.DataFrame:
         return pd.DataFrame()
     
     nvd = pd.DataFrame(row_accumulator)
-    nvd = nvd.rename(columns={'published_date': 'Published', 'affected_products': 'Affected Products', 'vendor': 'Vendor'})
+    nvd = nvd.rename(columns={'published_date': 'Published'})
     nvd['Published'] = pd.to_datetime(nvd['Published'], errors='coerce')
     nvd = nvd.sort_values(by=['Published'])
     nvd = nvd.reset_index(drop=True)
@@ -252,30 +240,13 @@ def main() -> None:
     patchthisapp_df = pd.merge(cve_list, nvd, how='inner', left_on='CVE', right_on='CVE')
     if not epss_df_all.empty:
         patchthisapp_df = pd.merge(patchthisapp_df, epss_df_all, how='inner', left_on='CVE', right_on='CVE')
-        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'epss', 'Description', 'Published', 'Source']
-        # Insert Vendor before Affected Products if both exist
-        if 'Vendor' in patchthisapp_df.columns and 'Affected Products' in patchthisapp_df.columns:
-            columns.append('Vendor')
-            columns.append('Affected Products')
-        else:
-            if 'Vendor' in patchthisapp_df.columns:
-                columns.append('Vendor')
-            if 'Affected Products' in patchthisapp_df.columns:
-                columns.append('Affected Products')
+        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'epss', 'Description', 'Published', 'Source', 'cpe']
         patchthisapp_df = patchthisapp_df[columns]
-        patchthisapp_df = patchthisapp_df.rename(columns={"epss": "EPSS", "cvss_vector": "CVSS_Vector"})
+        patchthisapp_df = patchthisapp_df.rename(columns={"epss": "EPSS", "cvss_vector": "CVSS_Vector", "cpe": "CPE"})
     else:
-        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'Description', 'Published', 'Source']
-        if 'Vendor' in patchthisapp_df.columns and 'Affected Products' in patchthisapp_df.columns:
-            columns.append('Vendor')
-            columns.append('Affected Products')
-        else:
-            if 'Vendor' in patchthisapp_df.columns:
-                columns.append('Vendor')
-            if 'Affected Products' in patchthisapp_df.columns:
-                columns.append('Affected Products')
+        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'Description', 'Published', 'Source', 'cpe']
         patchthisapp_df = patchthisapp_df[columns]
-        patchthisapp_df = patchthisapp_df.rename(columns={"cvss_vector": "CVSS_Vector"})
+        patchthisapp_df = patchthisapp_df.rename(columns={"cvss_vector": "CVSS_Vector", "cpe": "CPE"})
     
     args.output.parent.mkdir(parents=True, exist_ok=True)
     patchthisapp_df.to_csv(args.output, index=False)
