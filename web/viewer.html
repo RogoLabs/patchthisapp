@@ -153,7 +153,282 @@
             background: var(--border-light);
         }
 
-        .cve-cell {
+        /* Stats Grid */
+            /* Statistics Container Styles */
+            .stats-container {
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border: 1px solid #e2e8f0;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+            
+            .stats-header {
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                color: white;
+                padding: 1.5rem 2rem;
+                border-radius: var(--border-radius) var(--border-radius) 0 0;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .stats-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+                opacity: 0.3;
+            }
+            
+            .stats-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin: 0 0 0.25rem 0;
+                position: relative;
+                z-index: 1;
+            }
+            
+            .stats-subtitle {
+                font-size: 0.9rem;
+                opacity: 0.8;
+                font-weight: 400;
+                position: relative;
+                z-index: 1;
+            }
+            
+            .stats-content {
+                padding: 2rem;
+            }
+            
+            .stats-grid-three-rows {
+                display: flex;
+                flex-direction: column;
+                gap: 2rem;
+                max-width: 1000px;
+                margin: 0 auto;
+            }
+            
+            .stats-row-1 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+            
+            .stats-row-2, .stats-row-3 {
+                display: flex;
+                justify-content: center;
+            }
+            
+            .stat-card.full-width {
+                width: 100%;
+                max-width: none;
+            }
+            
+            .stat-card {
+                background: white;
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .stat-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .stat-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+                border-color: #3b82f6;
+            }
+            
+            .stat-card:hover::before {
+                transform: translateX(0);
+            }
+            
+            .stat-card.primary::before,
+            .stat-card.secondary::before,
+            .stat-card.tertiary::before,
+            .stat-card.highlight::before { 
+                background: linear-gradient(90deg, #64748b, #475569); 
+            }
+            
+            .stat-card.primary,
+            .stat-card.secondary,
+            .stat-card.tertiary,
+            .stat-card.highlight {
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border-color: #e2e8f0;
+            }
+            
+            .stat-card.large {
+                padding: 2rem 1.5rem;
+                min-height: 120px;
+                justify-content: center;
+            }
+            
+            .stat-card.large .stat-value {
+                font-size: 2.5rem;
+                font-weight: 900;
+            }
+            
+            .stat-card.large .stat-icon {
+                font-size: 2.5rem;
+            }
+            
+            .stat-card.detail {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                min-height: 200px;
+            }
+            
+            .stat-card.detail .stat-header-row {
+                align-self: stretch;
+            }
+            
+            .stat-icon {
+                font-size: 2rem;
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            }
+            
+            .stat-info {
+                flex: 1;
+            }
+            
+            .stat-header-row {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                width: 100%;
+            }
+            
+            .stat-label {
+                font-size: 0.875rem;
+                color: #64748b;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+                font-weight: 800;
+                color: #1e293b;
+                font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+                line-height: 1;
+            }
+            
+            .stat-value.small {
+                font-size: 0.9rem;
+                font-weight: 600;
+                line-height: 1.4;
+                word-break: break-all;
+                background: #f1f5f9;
+                padding: 0.75rem;
+                border-radius: 6px;
+                margin-top: 0.25rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            }
+            
+            .cpe-list-modern {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                width: 100%;
+            }
+            
+            .cpe-list-modern li {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                padding: 0.75rem 0;
+                font-size: 0.875rem;
+                color: #475569;
+                border-bottom: 1px solid #f1f5f9;
+                transition: all 0.2s ease;
+                line-height: 1.4;
+                gap: 1rem;
+            }
+            
+            .cpe-list-modern li .cpe-name {
+                flex: 1;
+                word-break: break-word;
+                font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+                font-size: 0.8rem;
+            }
+            
+            .cpe-list-modern li:last-child {
+                border-bottom: none;
+            }
+            
+            .cpe-list-modern li:hover {
+                background: #f8fafc;
+                margin: 0 -0.5rem;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+                border-radius: 6px;
+            }
+            
+            .cpe-list-modern .cpe-count {
+                font-weight: 700;
+                color: #f59e0b;
+                background: #fef3c7;
+                padding: 0.25rem 0.5rem;
+                border-radius: 999px;
+                font-size: 0.75rem;
+                min-width: 2rem;
+                text-align: center;
+            }
+            
+            @media (max-width: 768px) {
+                .stats-content { 
+                    padding: 1.5rem; 
+                }
+                .stats-header { 
+                    padding: 1.25rem 1.5rem; 
+                }
+                .stats-grid-three-rows { 
+                    gap: 1rem; 
+                }
+                .stats-row-1 { 
+                    grid-template-columns: 1fr;
+                    gap: 1rem; 
+                }
+                .stat-card { 
+                    padding: 1.25rem; 
+                    min-height: auto;
+                }
+                .stat-card.large { 
+                    padding: 1.5rem 1.25rem; 
+                    min-height: 100px;
+                }
+                .stat-card.large .stat-value { 
+                    font-size: 2rem; 
+                }
+                .stat-card.detail { 
+                    min-height: auto; 
+                }
+            }        .cve-cell {
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             font-weight: 600;
             color: var(--primary);
@@ -299,7 +574,6 @@
                         </a>
                     </div>
                 </div>
-                
                 <div class="table-container">
                     <div id="loadingMessage" class="loading">Loading vulnerability data...</div>
                     <table id="dataTable" class="data-table" style="display: none;">
@@ -340,8 +614,58 @@
                         <tbody id="tableBody">
                         </tbody>
                     </table>
-                    <div id="errorMessage" class="error" style="display: none;">
-                        Failed to load vulnerability data. Please try again later.
+                    <div id="errorMessage" class="error" style="display: none;">Failed to load vulnerability data. Please try again later.</div>
+                </div>
+            </div>
+        </div>
+        <div class="card-section">
+            <div class="viewer-container stats-container" id="overviewStats" style="display:none;">
+                <div class="stats-header">
+                    <h2 class="stats-title">Overview Statistics</h2>
+                    <div class="stats-subtitle">Vulnerability Intelligence Summary</div>
+                </div>
+                <div class="stats-content">
+                    <div class="stats-grid-three-rows">
+                        <!-- Row 1: Key Metrics -->
+                        <div class="stats-row-1">
+                            <div class="stat-card primary large">
+                                <div class="stat-icon">🛡️</div>
+                                <div class="stat-info">
+                                    <div class="stat-label">Total Vulnerabilities</div>
+                                    <div class="stat-value" id="statTotal">—</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card secondary large">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-info">
+                                    <div class="stat-label">Unique Products</div>
+                                    <div class="stat-value" id="statCPEs">—</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Row 2: Attack Vector -->
+                        <div class="stats-row-2">
+                            <div class="stat-card tertiary detail full-width">
+                                <div class="stat-icon">⚡</div>
+                                <div class="stat-info">
+                                    <div class="stat-label">Most Common Attack Vector</div>
+                                    <div class="stat-value small" id="statVector">—</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Row 3: Most Affected Products -->
+                        <div class="stats-row-3">
+                            <div class="stat-card highlight detail full-width">
+                                <div class="stat-header-row">
+                                    <div class="stat-icon">🎯</div>
+                                    <div class="stat-label">Most Affected Products</div>
+                                </div>
+                                <ul id="statCPEList" class="cpe-list-modern"></ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -374,6 +698,9 @@
                 }
                 allData = parsed.data;
                 filteredData = parsed.data;
+                // Overview statistics
+                updateOverviewStats(allData);
+                document.getElementById('overviewStats').style.display = 'block';
                 // Sort by Published date (newest first) by default
                 sortData('Published', 'desc');
                 updateSortIndicators();
@@ -383,6 +710,57 @@
                 console.error('Error loading data:', error);
                 document.getElementById('loadingMessage').style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+
+        // Overview statistics function
+        function updateOverviewStats(data) {
+            // Total vulnerabilities
+            document.getElementById('statTotal').textContent = data.length.toLocaleString();
+
+            // Unique CPEs and top CPEs
+            const cpeCounts = {};
+            data.forEach(row => {
+                if (row['CPE'] && row['CPE'].trim()) {
+                    row['CPE'].split(';').forEach(cpe => {
+                        const c = cpe.trim();
+                        if (c) cpeCounts[c] = (cpeCounts[c] || 0) + 1;
+                    });
+                }
+            });
+            const uniqueCPEs = Object.keys(cpeCounts);
+            document.getElementById('statCPEs').textContent = uniqueCPEs.length.toLocaleString();
+
+            // Top 5 CPEs
+            const cpeList = document.getElementById('statCPEList');
+            cpeList.innerHTML = '';
+            const topCPEs = Object.entries(cpeCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            if (topCPEs.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'No data available.';
+                cpeList.appendChild(li);
+            } else {
+                topCPEs.forEach(([cpe, count]) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span class="cpe-name">${cpe}</span><span class="cpe-count">${count.toLocaleString()}</span>`;
+                    cpeList.appendChild(li);
+                });
+            }
+
+            // Most common CVSS vector
+            const vectorCounts = {};
+            data.forEach(row => {
+                if (row['CVSS_Vector'] && row['CVSS_Vector'].trim()) {
+                    const v = row['CVSS_Vector'].trim();
+                    vectorCounts[v] = (vectorCounts[v] || 0) + 1;
+                }
+            });
+            const sortedVectors = Object.entries(vectorCounts).sort((a, b) => b[1] - a[1]);
+            if (sortedVectors.length) {
+                // Display CVSS vector on one line
+                document.getElementById('statVector').textContent = `${sortedVectors[0][0]} (${sortedVectors[0][1].toLocaleString()} occurrences)`;
+            } else {
+                document.getElementById('statVector').textContent = 'No data';
             }
         }
 

@@ -200,6 +200,8 @@ def process_nvd_files(nvd_path: Path) -> pd.DataFrame:
     nvd = pd.DataFrame(row_accumulator)
     nvd = nvd.rename(columns={'published_date': 'Published'})
     nvd['Published'] = pd.to_datetime(nvd['Published'], errors='coerce')
+    # Format as YYYY-MM-DD for output
+    nvd['Published'] = nvd['Published'].dt.strftime('%Y-%m-%d')
     nvd = nvd.sort_values(by=['Published'])
     nvd = nvd.reset_index(drop=True)
     return nvd
