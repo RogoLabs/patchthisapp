@@ -103,8 +103,26 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
         'exploitability_score': 'Missing_Data',
         'impact_score': 'Missing_Data',
         'cwe': 'Missing_Data',
-        'description': ''
+        'description': '',
+        'cpe': '',
+        'cvss_vector': ''
     }
+    # Extract CPEs (if present)
+    try:
+        cpe_list = []
+        configurations = entry.get('cve', {}).get('configurations', [])
+        for config in configurations:
+            nodes = config.get('nodes', [])
+            for node in nodes:
+                cpe_matches = node.get('cpeMatch', [])
+                for cpe in cpe_matches:
+                    cpe_uri = cpe.get('criteria') or cpe.get('cpe23Uri')
+                    if cpe_uri:
+                        cpe_list.append(cpe_uri)
+        if cpe_list:
+            fields['cpe'] = ';'.join(sorted(set(cpe_list)))
+    except Exception as e:
+        logging.warning(f"Error extracting CPEs: {e}")
     
     try:
         cve_data = entry.get('cve', {})
@@ -134,6 +152,7 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
                 'base_severity': cvss_data.get('baseSeverity', fields['base_severity']),
                 'exploitability_score': str(cvss_data.get('exploitabilityScore', fields['exploitability_score'])),
                 'impact_score': str(cvss_data.get('impactScore', fields['impact_score'])),
+                'cvss_vector': cvss_data.get('vectorString', cvss_data.get('attackVector', fields['cvss_vector']))
             })
         
         # Extract CWE information
@@ -181,6 +200,8 @@ def process_nvd_files(nvd_path: Path) -> pd.DataFrame:
     nvd = pd.DataFrame(row_accumulator)
     nvd = nvd.rename(columns={'published_date': 'Published'})
     nvd['Published'] = pd.to_datetime(nvd['Published'], errors='coerce')
+    # Format as YYYY-MM-DD for output
+    nvd['Published'] = nvd['Published'].dt.strftime('%Y-%m-%d')
     nvd = nvd.sort_values(by=['Published'])
     nvd = nvd.reset_index(drop=True)
     return nvd
@@ -221,10 +242,13 @@ def main() -> None:
     patchthisapp_df = pd.merge(cve_list, nvd, how='inner', left_on='CVE', right_on='CVE')
     if not epss_df_all.empty:
         patchthisapp_df = pd.merge(patchthisapp_df, epss_df_all, how='inner', left_on='CVE', right_on='CVE')
-        patchthisapp_df = patchthisapp_df[['CVE', 'CVSS Score', 'epss', 'Description', 'Published', 'Source']]
-        patchthisapp_df = patchthisapp_df.rename(columns={"epss": "EPSS"})
+        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'epss', 'Description', 'Published', 'Source', 'cpe']
+        patchthisapp_df = patchthisapp_df[columns]
+        patchthisapp_df = patchthisapp_df.rename(columns={"epss": "EPSS", "cvss_vector": "CVSS_Vector", "cpe": "CPE"})
     else:
-        patchthisapp_df = patchthisapp_df[['CVE', 'CVSS Score', 'Description', 'Published', 'Source']]
+        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'Description', 'Published', 'Source', 'cpe']
+        patchthisapp_df = patchthisapp_df[columns]
+        patchthisapp_df = patchthisapp_df.rename(columns={"cvss_vector": "CVSS_Vector", "cpe": "CPE"})
     
     args.output.parent.mkdir(parents=True, exist_ok=True)
     patchthisapp_df.to_csv(args.output, index=False)
