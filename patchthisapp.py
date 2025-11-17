@@ -155,12 +155,22 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
                 'cvss_vector': cvss_data.get('vectorString', cvss_data.get('attackVector', fields['cvss_vector']))
             })
         
-        # Extract CWE information
+        # Extract CWE information (collect all CWEs and strip CWE- prefix)
         weaknesses = cve_data.get('weaknesses', [])
         if weaknesses and isinstance(weaknesses, list):
-            weakness_desc = weaknesses[0].get('description', [])
-            if weakness_desc and isinstance(weakness_desc, list):
-                fields['cwe'] = weakness_desc[0].get('value', fields['cwe'])
+            cwe_list = []
+            for weakness in weaknesses:
+                weakness_desc = weakness.get('description', [])
+                if weakness_desc and isinstance(weakness_desc, list):
+                    for desc in weakness_desc:
+                        cwe_value = desc.get('value', '')
+                        if cwe_value and cwe_value != 'Missing_Data':
+                            # Strip CWE- prefix to keep only the number/identifier
+                            if cwe_value.startswith('CWE-'):
+                                cwe_value = cwe_value[4:]  # Remove 'CWE-' prefix
+                            cwe_list.append(cwe_value)
+            if cwe_list:
+                fields['cwe'] = ', '.join(sorted(set(cwe_list)))
         
         # Extract description
         descriptions = cve_data.get('descriptions', [])
@@ -242,28 +252,28 @@ def main() -> None:
     patchthisapp_df = pd.merge(cve_list, nvd, how='inner', left_on='CVE', right_on='CVE')
     if not epss_df_all.empty:
         patchthisapp_df = pd.merge(patchthisapp_df, epss_df_all, how='inner', left_on='CVE', right_on='CVE')
-        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'epss', 'Description', 'Published', 'Source', 'cpe']
+        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'epss', 'Description', 'Published', 'Source', 'cwe', 'cpe']
         patchthisapp_df = patchthisapp_df[columns]
-        patchthisapp_df = patchthisapp_df.rename(columns={"epss": "EPSS", "cvss_vector": "CVSS_Vector", "cpe": "CPE"})
+        patchthisapp_df = patchthisapp_df.rename(columns={"epss": "EPSS", "cvss_vector": "CVSS_Vector", "cwe": "CWE", "cpe": "CPE"})
     else:
-        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'Description', 'Published', 'Source', 'cpe']
+        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'Description', 'Published', 'Source', 'cwe', 'cpe']
         patchthisapp_df = patchthisapp_df[columns]
-        patchthisapp_df = patchthisapp_df.rename(columns={"cvss_vector": "CVSS_Vector", "cpe": "CPE"})
+        patchthisapp_df = patchthisapp_df.rename(columns={"cvss_vector": "CVSS_Vector", "cwe": "CWE", "cpe": "CPE"})
     
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    patchthisapp_df.to_csv(args.output, index=False)
+    patchthisapp_df.to_csv(args.output, index=False, encoding='utf-8', lineterminator='\n')
     logging.info(f"Wrote output to {args.output}")
     
     # Also save a copy to the web folder for the CSV viewer
     web_csv_path = Path('web/data.csv')
     web_csv_path.parent.mkdir(parents=True, exist_ok=True)
-    patchthisapp_df.to_csv(web_csv_path, index=False)
+    patchthisapp_df.to_csv(web_csv_path, index=False, encoding='utf-8', lineterminator='\n')
     logging.info(f"Wrote web copy to {web_csv_path}")
     
     # Also save a copy to the web/viewer folder for the CSV viewer
     web_viewer_csv_path = Path('web/viewer/data.csv')
     web_viewer_csv_path.parent.mkdir(parents=True, exist_ok=True)
-    patchthisapp_df.to_csv(web_viewer_csv_path, index=False)
+    patchthisapp_df.to_csv(web_viewer_csv_path, index=False, encoding='utf-8', lineterminator='\n')
     logging.info(f"Wrote web viewer copy to {web_viewer_csv_path}")
 
 if __name__ == "__main__":
