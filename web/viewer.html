@@ -20,9 +20,6 @@
         }
 
         .viewer-header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
             padding: 1.5rem 2rem;
             background: white;
             border-bottom: 2px solid var(--border-light);
@@ -31,7 +28,6 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .viewer-title {
@@ -117,7 +113,7 @@
             color: var(--text-primary);
             border-bottom: 2px solid var(--primary-lighter);
             position: sticky;
-            top: 80px; /* Offset for viewer-header height */
+            top: 0;
             z-index: 10;
             cursor: pointer;
             user-select: none;
