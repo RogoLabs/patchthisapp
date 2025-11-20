@@ -3,29 +3,86 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --primary: #0066cc;
-  --primary-dark: #004499;
-  --secondary: #6366f1;
-  --accent: #f59e0b;
+  /* RogoLabs Primary Blue Palette (from cve.icu and cveforecast.org) */
+  --primary: #2196f3;
+  --primary-dark: #1e88e5;
+  --primary-darker: #1976d2;
+  --primary-darkest: #1e40af;
+  --primary-light: #64b5f6;
+  --primary-lighter: #90caf9;
+  --primary-lightest: #e3f2fd;
+  
+  /* Secondary & Accent Colors */
+  --secondary: #3b82f6;
+  --accent: #60a5fa;
+  --accent-hover: #2563eb;
+  
+  /* Background Colors */
   --neutral: #fafbfc;
-  --background: #fafbfc;
+  --background: #f8f9fa;
   --surface: #ffffff;
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
-  --border: #e5e7eb;
-  --border-light: #f3f4f6;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  --gradient-subtle: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --surface-alt: #f8fafc;
+  --surface-tertiary: #f1f5f9;
+  
+  /* Dark Backgrounds (for headers/footers) */
+  --dark: #1f2937;
+  --dark-secondary: #374151;
+  --dark-tertiary: #111827;
+  
+  /* Text Colors */
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-muted: #6c757d;
+  --text-gray: #475569;
+  --text-gray-dark: #334155;
+  --text-on-dark: #e5e7eb;
+  
+  /* Borders */
+  --border: #dee2e6;
+  --border-light: #e2e8f0;
+  --border-lighter: #f3f4f6;
+  
+  /* Status Colors */
+  --success: #81c784;
+  --success-alt: #10b981;
+  --success-bright: #34d399;
+  --warning: #ffb74d;
+  --warning-alt: #f59e0b;
+  --error: #f06292;
+  --info: #60a5fa;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  --gradient-secondary: linear-gradient(135deg, #bbdefb, #90caf9);
+  --gradient-tertiary: linear-gradient(135deg, #90caf9, #64b5f6);
+  --gradient-subtle: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  --gradient-dark: linear-gradient(135deg, #1f2937 0%, #374151 50%, #111827 100%);
+  
+  /* Chart Colors (Blue to Gray Gradient) */
+  --chart-1: #e3f2fd;
+  --chart-2: #d6e7f5;
+  --chart-3: #c8dff0;
+  --chart-4: #b9d7eb;
+  --chart-5: #aacfe6;
+  --chart-6: #9bc7e1;
+  --chart-7: #8cbfdc;
+  --chart-8: #7db7d7;
+  --chart-9: #6eafd2;
+  --chart-10: #5fa7cd;
+  --chart-11: #509fc8;
+  --chart-12: #4197c3;
+  
+  /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* Border Radius */
   --border-radius: 12px;
   --border-radius-sm: 8px;
   --border-radius-lg: 16px;
+  
+  /* Typography */
   --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   --font-size-base: 1rem;
   --font-size-h1: 2.5rem;
@@ -35,6 +92,8 @@
   --font-size-caption: 0.875rem;
   --line-height-base: 1.6;
   --line-height-heading: 1.2;
+  
+  /* Spacing */
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
   --spacing-md: 2rem;
@@ -196,7 +255,7 @@ nav {
 
 /* Main Content */
 main {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 2rem;
 }
@@ -212,9 +271,9 @@ main {
 }
 
 .hero-content {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 0 2rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .hero-content h2 {
@@ -463,7 +522,7 @@ a:hover, a:focus {
   border: 1px solid var(--border);
   padding: var(--spacing-lg) var(--spacing-md);
   margin: 0 auto var(--spacing-lg) auto;
-  max-width: 900px;
+  max-width: 1400px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -664,7 +723,7 @@ li {
 .hero-section.card {
   padding: var(--spacing-lg) var(--spacing-md) !important;
   margin: 0 auto var(--spacing-lg) auto;
-  max-width: 900px;
+  max-width: 1400px;
   width: 100%;
   box-sizing: border-box;
   background: var(--surface);

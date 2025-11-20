@@ -10,25 +10,91 @@
 <body>
     <nav class="main-nav">
         <div class="nav-container">
-            <a href="#home" class="nav-link"><span>🏠</span> Home</a>
-            <a href="viewer.html" class="nav-link"><span>📊</span> Dashboard</a>
-            <a href="#sources" class="nav-link"><span>🔗</span> Sources</a>
-            <a href="#about" class="nav-link"><span>💡</span> About</a>
-            <a href="#contact" class="nav-link"><span>✉️</span> Contact</a>
+            <a href="index.html" class="nav-link"><span>🏠</span> Home</a>
+            <a href="dashboard.html" class="nav-link"><span>📊</span> Dashboard</a>
+            <a href="viewer.html" class="nav-link"><span>🔍</span> Explorer</a>
             <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="nav-link nav-link-external"><span>🌐</span> GitHub</a>
         </div>
     </nav>
-    <header class="hero-section card" id="home">
-        <div class="hero-content">
-            <h1 class="main-title">PatchThisApp</h1>
-            <p class="subtitle">Vulnerability Prioritization Intelligence Platform</p>
-            <p class="hero-description">PatchThisApp integrates with industry-leading vulnerability intelligence sources, delivering real-time, actionable data to help you prioritize and respond to the threats that matter most. Our platform is designed for security teams who demand clarity, speed, and reliability in vulnerability management.</p>
-        </div>
-    </header>
     <main>
+        <!-- Hero Section -->
+        <header class="hero-section card" id="home" style="background: white; margin-top: 2rem;">
+            <div class="hero-content">
+                <h1 style="font-size: 3rem; font-weight: 800; color: #1f2937; margin: 0 0 1rem 0; letter-spacing: -0.02em;">PatchThisApp</h1>
+                <p style="font-size: 1.5rem; color: var(--primary); font-weight: 600; margin: 0 0 1.5rem 0;">Curated Vulnerability Intelligence</p>
+                <p style="font-size: 1.125rem; color: var(--text-secondary); line-height: 1.7; margin: 0 0 2.5rem 0;">
+                    Stop drowning in CVEs. Get actionable intelligence from CISA KEV, Metasploit, Nuclei, and EPSS—curated for security teams who need to know what to patch first.
+                </p>
+                
+                <!-- Primary CTA -->
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem;">
+                    <a href="dashboard.html" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2.5rem; background: var(--primary); color: white; text-decoration: none; border-radius: var(--border-radius); font-weight: 600; font-size: 1.125rem; box-shadow: var(--shadow-lg); transition: all 0.2s; border: none;">
+                        View Analytics Dashboard
+                    </a>
+                    <a href="data.csv" download style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2.5rem; background: var(--surface); color: var(--text-primary); text-decoration: none; border-radius: var(--border-radius); font-weight: 600; font-size: 1.125rem; border: 2px solid var(--border); transition: all 0.2s;">
+                        ⬇️ Download CSV
+                    </a>
+                </div>
+                
+                <!-- Trust Indicators -->
+                <div style="display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; padding: 2rem 0 0 0; border-top: 1px solid var(--border-light);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; font-weight: 600;">Refreshed</div>
+                        <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">Every 6 Hours</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; font-weight: 600;">Sources</div>
+                        <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">4 Trusted Feeds</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; font-weight: 600;">Format</div>
+                        <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">100% Open Source</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
         <div class="card-section">
+            <!-- Value Proposition -->
+            <section class="feature-section card" style="background: white;">
+                <h2 style="text-align: center; margin-bottom: 1rem;">Why PatchThisApp?</h2>
+                <p style="text-align: center; color: var(--text-secondary); font-size: 1.125rem; margin: 0 auto 3rem;">
+                    Not all CVEs are created equal. We filter the signal from the noise.
+                </p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎯</div>
+                        <h3 style="margin: 0 0 0.75rem 0; font-size: 1.25rem; color: var(--text-primary);">Focus on What Matters</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin: 0;">
+                            Only vulnerabilities with active exploits, public PoCs, or high exploit probability (EPSS &gt; 0.90).
+                        </p>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 1rem;">⚡</div>
+                        <h3 style="margin: 0 0 0.75rem 0; font-size: 1.25rem; color: var(--text-primary);">Always Up to Date</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin: 0;">
+                            Automated data collection from 4 trusted sources, refreshed every 6 hours around the clock.
+                        </p>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔓</div>
+                        <h3 style="margin: 0 0 0.75rem 0; font-size: 1.25rem; color: var(--text-primary);">Free & Open Source</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin: 0;">
+                            No registration, no API keys, no paywalls. Use the dashboard, download the CSV, or fork the code.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Intelligence Sources -->
             <section id="sources" class="feature-section card">
-                <h2>PatchThisApp Intelligence Sources</h2>
+                <h2 style="text-align: center;">Trusted Intelligence Sources</h2>
+                <p style="text-align: center; color: var(--text-secondary); font-size: 1.125rem; margin: 0 auto 2.5rem;">
+                    Our data comes from four industry-leading vulnerability intelligence feeds
+                </p>
                 <div class="features-grid intelligence-grid">
                     <div class="feature-card intelligence-card">
                         <div class="feature-icon">🛡️</div>
@@ -59,29 +125,33 @@
                         </div>
                     </div>
                 </div>
-                <div class="feature-meta center-meta">
-                    <span>🔄 Updated every 6 hours</span>
-                    <span>📅 Data from last 6 months</span>
-                    <span>🔗 <a href="https://rogolabs.net/" target="_blank">RogoLabs</a> Project</span>
+            </section>
+
+            <!-- Get Started CTA -->
+            <section class="feature-section card" style="background: white; text-align: center;">
+                <h2 style="color: var(--text-primary); margin-bottom: 1rem;">Ready to Get Started?</h2>
+                <p style="color: var(--text-secondary); font-size: 1.125rem; margin: 0 auto 2rem;">
+                    View interactive analytics or download the raw data—it's your choice.
+                </p>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="dashboard.html" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: var(--primary); color: white; text-decoration: none; border-radius: var(--border-radius); font-weight: 600; font-size: 1.125rem; box-shadow: var(--shadow-md); transition: all 0.2s;">
+                        📊 View Dashboard
+                    </a>
+                    <a href="viewer.html" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: var(--surface); color: var(--primary); text-decoration: none; border-radius: var(--border-radius); font-weight: 600; font-size: 1.125rem; border: 2px solid var(--border); transition: all 0.2s;">
+                        🔍 Browse Data
+                    </a>
                 </div>
             </section>
-            <section id="about" class="about-section card">
-                <h2>About PatchThisApp</h2>
-                <div class="about-content">
-                    <p><strong>PatchThisApp</strong> is a <a href="https://rogolabs.net/" target="_blank">RogoLabs</a> project, delivering enterprise-grade vulnerability intelligence to security teams worldwide. Originally created by <a href="https://www.jerrygamblin.com" target="_blank">Jerry Gamblin</a>, this platform addresses the challenge of vulnerability prioritization in an era of information overload.</p>
-                    <ul class="about-list">
-                        <li>✅ 24/7 Real-time Intelligence</li>
-                        <li>✅ 4+ Data Sources Integrated</li>
-                        <li>✅ 100% Open Source</li>
-                    </ul>
-                </div>
-            </section>
-            <section id="contact" class="contact-section card">
-                <h2>Contact & Community</h2>
+
+            <!-- About & Contact -->
+            <section id="contact" class="contact-section card" style="text-align: center;">
+                <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 2rem;">
+                    A <a href="https://rogolabs.net/" target="_blank" style="color: var(--primary); font-weight: 600;">RogoLabs</a> project, originally created by <a href="https://www.jerrygamblin.com" target="_blank" style="color: var(--primary); font-weight: 600;">Jerry Gamblin</a>
+                </p>
                 <div class="contact-links">
                     <a href="https://github.com/RogoLabs/patchthisapp/issues" target="_blank" class="contact-link">💬 Report Issues</a>
-                    <a href="https://rogolabs.net/" target="_blank" class="contact-link">🌐 Visit RogoLabs</a>
                     <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="contact-link">⭐ Star on GitHub</a>
+                    <a href="https://rogolabs.net/" target="_blank" class="contact-link">🌐 RogoLabs</a>
                 </div>
             </section>
         </div>
