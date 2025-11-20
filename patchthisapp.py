@@ -66,7 +66,7 @@ def load_epss(epss_path: Path) -> Tuple[pd.DataFrame, pd.DataFrame]:
         return df, df
     df = df.rename(columns={"cve": "CVE"})
     df_all = df.copy()
-    df = df[df.epss > .95].copy()
+    df = df[df.epss > .90].copy()
     df['Source'] = 'EPSS'
     return df[['CVE', 'Source']], df_all
 

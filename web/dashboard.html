@@ -617,16 +617,16 @@
             const epssRanges = {
                 'Low (0-0.5)': 0,
                 'Medium (0.5-0.8)': 0,
-                'High (0.8-0.95)': 0,
-                'Critical (>0.95)': 0
+                'High (0.8-0.90)': 0,
+                'Critical (>0.90)': 0
             };
 
             allData.forEach(row => {
                 const epss = parseFloat(row['EPSS']) || 0;
                 if (epss < 0.5) epssRanges['Low (0-0.5)']++;
                 else if (epss < 0.8) epssRanges['Medium (0.5-0.8)']++;
-                else if (epss <= 0.95) epssRanges['High (0.8-0.95)']++;
-                else epssRanges['Critical (>0.95)']++;
+                else if (epss <= 0.90) epssRanges['High (0.8-0.90)']++;
+                else epssRanges['Critical (>0.90)']++;
             });
 
             const ctx = document.getElementById('epssChart').getContext('2d');

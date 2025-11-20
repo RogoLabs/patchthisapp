@@ -13,7 +13,7 @@ Part of the [RogoLabs](https://rogolabs.net/) network | Originally created by [J
 
 ## Overview
 
-PatchThisApp aggregates vulnerability data from four trusted intelligence sources and presents it as a filterable, sortable dataset. The platform focuses exclusively on vulnerabilities with active exploits, public proof-of-concepts, or high EPSS scores (>0.95), filtering out noise from the ~25,000+ CVEs published annually.
+PatchThisApp aggregates vulnerability data from four trusted intelligence sources and presents it as a filterable, sortable dataset. The platform focuses exclusively on vulnerabilities with active exploits, public proof-of-concepts, or high EPSS scores (>0.90), filtering out noise from the ~25,000+ CVEs published annually.
 
 ### Core Capabilities
 
@@ -31,7 +31,7 @@ PatchThisApp aggregates vulnerability data from four trusted intelligence source
 | [CISA KEV](https://www.cisa.gov/known-exploited-vulnerabilities-catalog) | Known exploited vulnerabilities | Daily | Active exploitation confirmed |
 | [Rapid7 Metasploit](https://docs.rapid7.com/metasploit/modules/) | Exploit modules | Continuous | Public exploit module exists |
 | [Project Discovery Nuclei](https://github.com/projectdiscovery/nuclei-templates) | Detection templates | Continuous | Detection template available |
-| [EPSS](https://www.first.org/epss/) | Exploit prediction | Daily | EPSS score > 0.95 |
+| [EPSS](https://www.first.org/epss/) | Exploit prediction | Daily | EPSS score > 0.90 |
 
 ### Data Collection Process
 
