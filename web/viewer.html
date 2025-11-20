@@ -154,48 +154,28 @@
         }
 
         /* Stats Grid */
-            /* Statistics Container Styles */
-            .stats-container {
-                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-                border: 1px solid #e2e8f0;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            }
+            /* Statistics Container Styles - removed, using default viewer-container white background */
             
             .stats-header {
-                background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-                color: white;
-                padding: 1.5rem 2rem;
-                border-radius: var(--border-radius) var(--border-radius) 0 0;
+                background: white;
+                color: var(--text-primary);
+                padding: 2rem 2rem 1rem 2rem;
                 text-align: center;
-                position: relative;
-                overflow: hidden;
-            }
-            
-            .stats-header::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-                opacity: 0.3;
+                border-bottom: 1px solid var(--border-light);
             }
             
             .stats-title {
                 font-size: 1.5rem;
                 font-weight: 700;
-                margin: 0 0 0.25rem 0;
-                position: relative;
-                z-index: 1;
+                color: var(--text-primary);
+                margin: 0 0 0.5rem 0;
             }
             
             .stats-subtitle {
-                font-size: 0.9rem;
-                opacity: 0.8;
+                font-size: 1rem;
+                color: var(--text-secondary);
                 font-weight: 400;
-                position: relative;
-                z-index: 1;
+                margin: 0;
             }
             
             .stats-content {
@@ -548,14 +528,15 @@
             <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="nav-link nav-link-external"><span>🌐</span> GitHub</a>
         </div>
     </nav>
-    <header class="hero-section card" id="dashboard-hero">
-        <div class="hero-content">
-            <h1 class="main-title">PatchThisApp</h1>
-            <p class="subtitle">Vulnerability Data Dashboard</p>
-            <p class="hero-description">Explore, search, and analyze the latest vulnerability intelligence. Use the dashboard below to filter, sort, and download real-time vulnerability data from trusted sources.</p>
-        </div>
-    </header>
     <main>
+        <!-- Hero Section -->
+        <header class="hero-section card" id="dashboard-hero" style="background: white; margin-top: 2rem; text-align: center;">
+            <div class="hero-content">
+                <h1 style="font-size: 2.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">Vulnerability Data Explorer</h1>
+                <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 0;">Search, filter, and analyze vulnerability intelligence from trusted sources</p>
+            </div>
+        </header>
+        
         <div class="card-section">
             <div class="viewer-container">
                 <div class="viewer-header">
@@ -617,7 +598,7 @@
             </div>
         </div>
         <div class="card-section">
-            <div class="viewer-container stats-container" id="overviewStats" style="display:none;">
+            <div class="viewer-container" id="overviewStats" style="display:none; background: white;">
                 <div class="stats-header">
                     <h2 class="stats-title">Overview Statistics</h2>
                     <div class="stats-subtitle">Vulnerability Intelligence Summary</div>
