@@ -31,6 +31,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .viewer-title {
@@ -116,11 +117,12 @@
             color: var(--text-primary);
             border-bottom: 2px solid var(--primary-lighter);
             position: sticky;
-            top: 0;
+            top: 80px; /* Offset for viewer-header height */
             z-index: 10;
             cursor: pointer;
             user-select: none;
             transition: background-color 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .data-table th:hover {
