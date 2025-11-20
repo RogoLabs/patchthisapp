@@ -15,14 +15,10 @@
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
-            overflow: visible;
-            padding: 0 1rem;
+            overflow: hidden;
         }
 
         .viewer-header {
-            position: sticky;
-            top: 0;
-            z-index: 101;
             padding: 1.5rem 2rem;
             background: white;
             border-bottom: 2px solid var(--border-light);
@@ -31,7 +27,6 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .viewer-title {
@@ -90,6 +85,9 @@
 
         .table-container {
             overflow-x: auto;
+            max-height: calc(100vh - 400px);
+            overflow-y: auto;
+            position: relative;
         }
 
         .data-table {
@@ -107,6 +105,12 @@
             padding-right: 0.5rem;
         }
 
+        .data-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
         .data-table th {
             background: var(--primary-lightest);
             padding: 1rem 0.75rem;
@@ -114,13 +118,9 @@
             font-weight: 600;
             color: var(--text-primary);
             border-bottom: 2px solid var(--primary-lighter);
-            position: sticky;
-            top: 75px;
-            z-index: 10;
             cursor: pointer;
             user-select: none;
             transition: background-color 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .data-table th:hover {
