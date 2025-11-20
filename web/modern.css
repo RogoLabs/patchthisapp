@@ -255,7 +255,7 @@ nav {
 
 /* Main Content */
 main {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 2rem;
 }
@@ -522,7 +522,7 @@ a:hover, a:focus {
   border: 1px solid var(--border);
   padding: var(--spacing-lg) var(--spacing-md);
   margin: 0 auto var(--spacing-lg) auto;
-  max-width: 900px;
+  max-width: 1400px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -723,7 +723,7 @@ li {
 .hero-section.card {
   padding: var(--spacing-lg) var(--spacing-md) !important;
   margin: 0 auto var(--spacing-lg) auto;
-  max-width: 900px;
+  max-width: 1400px;
   width: 100%;
   box-sizing: border-box;
   background: var(--surface);
