@@ -23,9 +23,9 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            padding: 1.2rem 1rem;
-            background: var(--gradient-subtle);
-            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            background: white;
+            border-bottom: 2px solid var(--border-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -36,7 +36,7 @@
         .viewer-title {
             margin: 0;
             font-size: 1.5rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-primary);
         }
 
@@ -48,40 +48,43 @@
         }
 
         .search-box {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border);
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-light);
             border-radius: var(--border-radius-sm);
             font-size: 0.875rem;
             background: var(--surface);
             color: var(--text-primary);
-            min-width: 200px;
+            min-width: 250px;
+            transition: all 0.2s ease;
         }
 
         .search-box:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgb(0 102 204 / 0.1);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
         }
 
         .btn-download {
-            background: var(--success);
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1.5rem;
             border-radius: var(--border-radius-sm);
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-download:hover {
-            background: #059669;
+            background: var(--primary-dark);
             transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
         .table-container {
@@ -106,12 +109,12 @@
         }
 
         .data-table th {
-            background: var(--gradient-subtle);
+            background: var(--primary-lightest);
             padding: 1rem 0.75rem;
             text-align: left;
             font-weight: 600;
             color: var(--text-primary);
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px solid var(--primary-lighter);
             position: sticky;
             top: 0;
             z-index: 10;
@@ -121,7 +124,7 @@
         }
 
         .data-table th:hover {
-            background: var(--border-light);
+            background: var(--primary-lighter);
         }
 
         .data-table th.sortable {
