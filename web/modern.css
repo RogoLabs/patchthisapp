@@ -271,9 +271,9 @@ main {
 }
 
 .hero-content {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 0 2rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .hero-content h2 {
