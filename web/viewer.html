@@ -209,52 +209,18 @@
             
             .stat-card {
                 background: white;
-                border: 1px solid #e2e8f0;
-                border-radius: 12px;
+                border: 2px solid var(--border-light);
+                border-radius: var(--border-radius);
                 padding: 1.5rem;
                 display: flex;
                 align-items: center;
                 gap: 1rem;
-                transition: all 0.3s ease;
-                position: relative;
-                overflow: hidden;
-            }
-            
-            .stat-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 3px;
-                background: linear-gradient(90deg, #3b82f6, #1d4ed8);
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
+                transition: all 0.2s ease;
             }
             
             .stat-card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-                border-color: #3b82f6;
-            }
-            
-            .stat-card:hover::before {
-                transform: translateX(0);
-            }
-            
-            .stat-card.primary::before,
-            .stat-card.secondary::before,
-            .stat-card.tertiary::before,
-            .stat-card.highlight::before { 
-                background: linear-gradient(90deg, #64748b, #475569); 
-            }
-            
-            .stat-card.primary,
-            .stat-card.secondary,
-            .stat-card.tertiary,
-            .stat-card.highlight {
-                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-                border-color: #e2e8f0;
+                border-color: var(--primary-lighter);
+                box-shadow: var(--shadow-md);
             }
             
             .stat-card.large {
@@ -265,7 +231,8 @@
             
             .stat-card.large .stat-value {
                 font-size: 2.5rem;
-                font-weight: 900;
+                font-weight: 800;
+                color: var(--primary);
             }
             
             .stat-card.large .stat-icon {
@@ -300,20 +267,19 @@
             }
             
             .stat-label {
-                font-size: 0.875rem;
-                color: #64748b;
-                margin-bottom: 0.5rem;
-                font-weight: 600;
+                font-size: 0.75rem;
                 text-transform: uppercase;
-                letter-spacing: 0.05em;
+                letter-spacing: 0.1em;
+                color: var(--text-muted);
+                font-weight: 600;
+                margin-bottom: 0.5rem;
             }
             
             .stat-value {
-                font-size: 2rem;
-                font-weight: 800;
-                color: #1e293b;
-                font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-                line-height: 1;
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                line-height: 1.2;
             }
             
             .stat-value.small {
@@ -372,10 +338,10 @@
             
             .cpe-list-modern .cpe-count {
                 font-weight: 700;
-                color: #f59e0b;
-                background: #fef3c7;
-                padding: 0.25rem 0.5rem;
-                border-radius: 999px;
+                color: var(--primary);
+                background: var(--primary-lightest);
+                padding: 0.25rem 0.75rem;
+                border-radius: 6px;
                 font-size: 0.75rem;
                 min-width: 2rem;
                 text-align: center;
