@@ -527,24 +527,38 @@
             });
         }
 
-        // Source Distribution Chart - with percentages
+        // Source Distribution Chart - showing feed overlap
         function createSourceChart() {
-            const sourceCounts = {};
+            const sourceComboCount = {};
+            
             allData.forEach(row => {
-                const sources = (row.Source || '').split('/');
-                sources.forEach(source => {
-                    if (source.trim()) {
-                        sourceCounts[source.trim()] = (sourceCounts[source.trim()] || 0) + 1;
-                    }
-                });
+                const sourceStr = row.Source || '';
+                const sources = sourceStr.split('/').map(s => s.trim()).filter(s => s);
+                const numSources = sources.length;
+                
+                let category;
+                if (numSources === 0) {
+                    category = 'Unknown';
+                } else if (numSources === 1) {
+                    category = `${sources[0]} Only`;
+                } else if (numSources === 2) {
+                    category = 'Two Feeds';
+                } else if (numSources === 3) {
+                    category = 'Three Feeds';
+                } else {
+                    category = 'All Four Feeds';
+                }
+                
+                sourceComboCount[category] = (sourceComboCount[category] || 0) + 1;
             });
 
-            const totalCount = Object.values(sourceCounts).reduce((a, b) => a + b, 0);
-            const labels = Object.keys(sourceCounts).map(source => {
-                const count = sourceCounts[source];
-                const percentage = ((count / totalCount) * 100).toFixed(1);
-                return `${source} (${percentage}%)`;
+            const totalCVEs = allData.length;
+            const sortedEntries = Object.entries(sourceComboCount).sort((a, b) => b[1] - a[1]);
+            const labels = sortedEntries.map(([category, count]) => {
+                const percentage = ((count / totalCVEs) * 100).toFixed(1);
+                return `${category} (${percentage}%)`;
             });
+            const data = sortedEntries.map(([_, count]) => count);
 
             const ctx = document.getElementById('sourceChart').getContext('2d');
             charts.source = new Chart(ctx, {
@@ -552,12 +566,14 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        data: Object.values(sourceCounts),
+                        data: data,
                         backgroundColor: [
                             colors.primary,
                             colors.secondary,
                             colors.tertiary,
-                            colors.warning
+                            colors.warning,
+                            colors.success,
+                            '#9e9e9e'
                         ],
                         borderWidth: 3,
                         borderColor: '#fff'
@@ -580,9 +596,10 @@
                             callbacks: {
                                 label: function(context) {
                                     const value = context.parsed;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const total = totalCVEs;
                                     const percentage = ((value / total) * 100).toFixed(1);
-                                    return `${context.label.split(' (')[0]}: ${value.toLocaleString()} CVEs (${percentage}%)`;
+                                    const category = sortedEntries[context.dataIndex][0];
+                                    return `${category}: ${value.toLocaleString()} CVEs (${percentage}%)`;
                                 }
                             }
                         }
