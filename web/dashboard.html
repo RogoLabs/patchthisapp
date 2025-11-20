@@ -231,9 +231,9 @@
                 <div class="stat-description">CVSS ≥ 7.0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Critical EPSS</div>
-                <div class="stat-value" id="criticalEPSS">—</div>
-                <div class="stat-description">EPSS > 0.95</div>
+                <div class="stat-label">Critical CVEs</div>
+                <div class="stat-value" id="criticalCVEs">—</div>
+                <div class="stat-description">CVSS ≥ 9.0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Average CVSS</div>
@@ -252,6 +252,15 @@
                 </div>
             </div>
 
+            <!-- Source Distribution - Featured -->
+            <div class="chart-card full-width">
+                <h3 class="chart-title">🔗 Data Source Contribution</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; text-align: center;">Percentage of vulnerabilities from each intelligence feed</p>
+                <div class="chart-container">
+                    <canvas id="sourceChart"></canvas>
+                </div>
+            </div>
+
             <!-- CVSS Distribution -->
             <div class="chart-card">
                 <h3 class="chart-title">🎯 CVSS Score Distribution</h3>
@@ -265,14 +274,6 @@
                 <h3 class="chart-title">⚡ Attack Vector Distribution</h3>
                 <div class="chart-container">
                     <canvas id="vectorChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Source Distribution -->
-            <div class="chart-card">
-                <h3 class="chart-title">🔗 Data Source Distribution</h3>
-                <div class="chart-container">
-                    <canvas id="sourceChart"></canvas>
                 </div>
             </div>
 
@@ -365,13 +366,13 @@
             // Calculate stats
             const totalVulns = allData.length;
             const highSeverity = allData.filter(row => parseFloat(row['CVSS Score']) >= 7.0).length;
-            const criticalEPSS = allData.filter(row => parseFloat(row['EPSS']) > 0.95).length;
+            const criticalCVEs = allData.filter(row => parseFloat(row['CVSS Score']) >= 9.0).length;
             const avgCVSS = (allData.reduce((sum, row) => sum + (parseFloat(row['CVSS Score']) || 0), 0) / totalVulns).toFixed(1);
 
             // Update stat cards
             document.getElementById('totalVulns').textContent = totalVulns.toLocaleString();
             document.getElementById('highSeverity').textContent = highSeverity.toLocaleString();
-            document.getElementById('criticalEPSS').textContent = criticalEPSS.toLocaleString();
+            document.getElementById('criticalCVEs').textContent = criticalCVEs.toLocaleString();
             document.getElementById('avgCVSS').textContent = avgCVSS;
 
             // Create charts
@@ -526,7 +527,7 @@
             });
         }
 
-        // Source Distribution Chart
+        // Source Distribution Chart - with percentages
         function createSourceChart() {
             const sourceCounts = {};
             allData.forEach(row => {
@@ -538,31 +539,52 @@
                 });
             });
 
+            const totalCount = Object.values(sourceCounts).reduce((a, b) => a + b, 0);
+            const labels = Object.keys(sourceCounts).map(source => {
+                const count = sourceCounts[source];
+                const percentage = ((count / totalCount) * 100).toFixed(1);
+                return `${source} (${percentage}%)`;
+            });
+
             const ctx = document.getElementById('sourceChart').getContext('2d');
             charts.source = new Chart(ctx, {
-                type: 'bar',
+                type: 'doughnut',
                 data: {
-                    labels: Object.keys(sourceCounts),
+                    labels: labels,
                     datasets: [{
-                        label: 'Count',
                         data: Object.values(sourceCounts),
-                        backgroundColor: colors.primary,
-                        borderWidth: 0
+                        backgroundColor: [
+                            colors.primary,
+                            colors.secondary,
+                            colors.tertiary,
+                            colors.warning
+                        ],
+                        borderWidth: 3,
+                        borderColor: '#fff'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
                         },
-                        x: {
-                            grid: { display: false }
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${context.label.split(' (')[0]}: ${value.toLocaleString()} CVEs (${percentage}%)`;
+                                }
+                            }
                         }
                     }
                 }
