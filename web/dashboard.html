@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - PatchThisApp</title>
+    <link rel="stylesheet" href="modern.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Dashboard-specific styles */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+
+        .stat-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Chart Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-container.tall {
+            height: 400px;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error {
+            background: #fff5f5;
+            border: 1px solid var(--error);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            color: #c53030;
+        }
+
+        /* Download Button */
+        .download-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            .dashboard-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-link"><span>🏠</span> Home</a>
+            <a href="dashboard.html" class="nav-link"><span>📊</span> Dashboard</a>
+            <a href="viewer.html" class="nav-link"><span>🔍</span> Explorer</a>
+            <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="nav-link"><span>🌐</span> GitHub</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Vulnerability Analytics Dashboard</h1>
+            <p class="dashboard-subtitle">Real-time vulnerability intelligence and trend analysis</p>
+            <a href="data.csv" download class="download-btn">
+                <span>⬇️</span> Download CSV Data
+            </a>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading vulnerability data...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="error" style="display: none;">
+            Failed to load vulnerability data. Please try again later.
+        </div>
+
+        <!-- Stats Grid -->
+        <div id="statsGrid" class="stats-grid" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">Total Vulnerabilities</div>
+                <div class="stat-value" id="totalVulns">—</div>
+                <div class="stat-description">CVEs tracked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">High Severity</div>
+                <div class="stat-value" id="highSeverity">—</div>
+                <div class="stat-description">CVSS ≥ 7.0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Critical EPSS</div>
+                <div class="stat-value" id="criticalEPSS">—</div>
+                <div class="stat-description">EPSS > 0.95</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average CVSS</div>
+                <div class="stat-value" id="avgCVSS">—</div>
+                <div class="stat-description">Mean severity score</div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div id="chartsGrid" class="charts-grid" style="display: none;">
+            <!-- Timeline Chart -->
+            <div class="chart-card full-width">
+                <h3 class="chart-title">📈 Vulnerability Timeline (Last 6 Months)</h3>
+                <div class="chart-container tall">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- CVSS Distribution -->
+            <div class="chart-card">
+                <h3 class="chart-title">🎯 CVSS Score Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="cvssChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Attack Vector Breakdown -->
+            <div class="chart-card">
+                <h3 class="chart-title">⚡ Attack Vector Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="vectorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Source Distribution -->
+            <div class="chart-card">
+                <h3 class="chart-title">🔗 Data Source Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="sourceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- EPSS Distribution -->
+            <div class="chart-card">
+                <h3 class="chart-title">📊 EPSS Risk Levels</h3>
+                <div class="chart-container">
+                    <canvas id="epssChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Products -->
+            <div class="chart-card full-width">
+                <h3 class="chart-title">🎯 Top 10 Most Affected Products</h3>
+                <div class="chart-container">
+                    <canvas id="productsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <span>&copy; 2025 RogoLabs. All rights reserved.</span>
+            <span class="footer-meta">v1.0 | <a href="https://rogolabs.net/" target="_blank">RogoLabs</a></span>
+        </div>
+    </footer>
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+
+    <script>
+        // Configure Chart.js defaults to match RogoLabs style
+        Chart.defaults.plugins.title.color = '#212529';
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+        Chart.defaults.plugins.tooltip.titleColor = '#212529';
+        Chart.defaults.plugins.tooltip.bodyColor = '#6c757d';
+        Chart.defaults.plugins.tooltip.borderColor = '#dee2e6';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+
+        // Color palette
+        const colors = {
+            primary: '#2196f3',
+            primaryDark: '#1e88e5',
+            secondary: '#64b5f6',
+            tertiary: '#90caf9',
+            success: '#81c784',
+            warning: '#ffb74d',
+            danger: '#f06292',
+            info: '#60a5fa',
+            chartGradient: [
+                '#e3f2fd', '#d6e7f5', '#c8dff0', '#b9d7eb', '#aacfe6',
+                '#9bc7e1', '#8cbfdc', '#7db7d7', '#6eafd2', '#5fa7cd',
+                '#509fc8', '#4197c3'
+            ]
+        };
+
+        let allData = [];
+        let charts = {};
+
+        // Load and process data
+        async function loadData() {
+            try {
+                const response = await fetch('./data.csv');
+                if (!response.ok) throw new Error('Failed to fetch data');
+                
+                const csvText = await response.text();
+                const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+                
+                if (parsed.errors.length) throw new Error('CSV parsing error');
+                
+                allData = parsed.data;
+                processData();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('statsGrid').style.display = 'grid';
+                document.getElementById('chartsGrid').style.display = 'grid';
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Process data and create visualizations
+        function processData() {
+            // Calculate stats
+            const totalVulns = allData.length;
+            const highSeverity = allData.filter(row => parseFloat(row['CVSS Score']) >= 7.0).length;
+            const criticalEPSS = allData.filter(row => parseFloat(row['EPSS']) > 0.95).length;
+            const avgCVSS = (allData.reduce((sum, row) => sum + (parseFloat(row['CVSS Score']) || 0), 0) / totalVulns).toFixed(1);
+
+            // Update stat cards
+            document.getElementById('totalVulns').textContent = totalVulns.toLocaleString();
+            document.getElementById('highSeverity').textContent = highSeverity.toLocaleString();
+            document.getElementById('criticalEPSS').textContent = criticalEPSS.toLocaleString();
+            document.getElementById('avgCVSS').textContent = avgCVSS;
+
+            // Create charts
+            createTimelineChart();
+            createCVSSChart();
+            createVectorChart();
+            createSourceChart();
+            createEPSSChart();
+            createProductsChart();
+        }
+
+        // Timeline Chart
+        function createTimelineChart() {
+            const monthCounts = {};
+            const sixMonthsAgo = dayjs().subtract(6, 'month');
+
+            allData.forEach(row => {
+                const date = dayjs(row.Published);
+                if (date.isAfter(sixMonthsAgo)) {
+                    const monthKey = date.format('YYYY-MM');
+                    monthCounts[monthKey] = (monthCounts[monthKey] || 0) + 1;
+                }
+            });
+
+            const sortedMonths = Object.keys(monthCounts).sort();
+            const labels = sortedMonths.map(m => dayjs(m).format('MMM YYYY'));
+            const data = sortedMonths.map(m => monthCounts[m]);
+
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            charts.timeline = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Vulnerabilities Published',
+                        data: data,
+                        borderColor: colors.primary,
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // CVSS Distribution Chart
+        function createCVSSChart() {
+            const cvssRanges = {
+                'Low (0-3.9)': 0,
+                'Medium (4-6.9)': 0,
+                'High (7-8.9)': 0,
+                'Critical (9-10)': 0
+            };
+
+            allData.forEach(row => {
+                const score = parseFloat(row['CVSS Score']) || 0;
+                if (score < 4) cvssRanges['Low (0-3.9)']++;
+                else if (score < 7) cvssRanges['Medium (4-6.9)']++;
+                else if (score < 9) cvssRanges['High (7-8.9)']++;
+                else cvssRanges['Critical (9-10)']++;
+            });
+
+            const ctx = document.getElementById('cvssChart').getContext('2d');
+            charts.cvss = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(cvssRanges),
+                    datasets: [{
+                        label: 'Count',
+                        data: Object.values(cvssRanges),
+                        backgroundColor: [colors.tertiary, colors.warning, colors.danger, '#d32f2f'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Attack Vector Chart
+        function createVectorChart() {
+            const vectorCounts = {};
+            allData.forEach(row => {
+                const vector = row['CVSS_Vector'] || 'Unknown';
+                vectorCounts[vector] = (vectorCounts[vector] || 0) + 1;
+            });
+
+            const sortedVectors = Object.entries(vectorCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const ctx = document.getElementById('vectorChart').getContext('2d');
+            charts.vector = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: sortedVectors.map(v => v[0]),
+                    datasets: [{
+                        data: sortedVectors.map(v => v[1]),
+                        backgroundColor: [
+                            colors.primary,
+                            colors.secondary,
+                            colors.tertiary,
+                            colors.warning,
+                            colors.success
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Source Distribution Chart
+        function createSourceChart() {
+            const sourceCounts = {};
+            allData.forEach(row => {
+                const sources = (row.Source || '').split('/');
+                sources.forEach(source => {
+                    if (source.trim()) {
+                        sourceCounts[source.trim()] = (sourceCounts[source.trim()] || 0) + 1;
+                    }
+                });
+            });
+
+            const ctx = document.getElementById('sourceChart').getContext('2d');
+            charts.source = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(sourceCounts),
+                    datasets: [{
+                        label: 'Count',
+                        data: Object.values(sourceCounts),
+                        backgroundColor: colors.primary,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // EPSS Chart
+        function createEPSSChart() {
+            const epssRanges = {
+                'Low (0-0.5)': 0,
+                'Medium (0.5-0.8)': 0,
+                'High (0.8-0.95)': 0,
+                'Critical (>0.95)': 0
+            };
+
+            allData.forEach(row => {
+                const epss = parseFloat(row['EPSS']) || 0;
+                if (epss < 0.5) epssRanges['Low (0-0.5)']++;
+                else if (epss < 0.8) epssRanges['Medium (0.5-0.8)']++;
+                else if (epss <= 0.95) epssRanges['High (0.8-0.95)']++;
+                else epssRanges['Critical (>0.95)']++;
+            });
+
+            const ctx = document.getElementById('epssChart').getContext('2d');
+            charts.epss = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(epssRanges),
+                    datasets: [{
+                        label: 'Count',
+                        data: Object.values(epssRanges),
+                        backgroundColor: [colors.tertiary, colors.warning, colors.danger, '#d32f2f'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Top Products Chart
+        function createProductsChart() {
+            const cpeCounts = {};
+            allData.forEach(row => {
+                if (row.CPE) {
+                    row.CPE.split(';').forEach(cpe => {
+                        const trimmed = cpe.trim();
+                        if (trimmed) {
+                            cpeCounts[trimmed] = (cpeCounts[trimmed] || 0) + 1;
+                        }
+                    });
+                }
+            });
+
+            const top10 = Object.entries(cpeCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            const ctx = document.getElementById('productsChart').getContext('2d');
+            charts.products = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: top10.map(p => p[0].length > 50 ? p[0].substring(0, 50) + '...' : p[0]),
+                    datasets: [{
+                        label: 'Vulnerabilities',
+                        data: top10.map(p => p[1]),
+                        backgroundColor: colors.chartGradient.slice(0, 10),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>
