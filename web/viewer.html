@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9V606CWMWX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-9V606CWMWX');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PatchThisApp - Data Viewer</title>
@@ -8,18 +17,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         .viewer-container {
-            margin: 0;
+            max-width: 1000px;
+            width: 98vw;
+            margin: 2rem auto;
             background: var(--surface);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow-md);
             border: 1px solid var(--border);
-            overflow: hidden;
+            overflow: visible;
+            padding: 0 1rem;
         }
 
         .viewer-header {
-            padding: 1.5rem 2rem;
-            background: white;
-            border-bottom: 2px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1.2rem 1rem;
+            background: var(--gradient-subtle);
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -30,7 +45,7 @@
         .viewer-title {
             margin: 0;
             font-size: 1.5rem;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--text-primary);
         }
 
@@ -42,50 +57,46 @@
         }
 
         .search-box {
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border-light);
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
             border-radius: var(--border-radius-sm);
             font-size: 0.875rem;
             background: var(--surface);
             color: var(--text-primary);
-            min-width: 250px;
-            transition: all 0.2s ease;
+            min-width: 200px;
         }
 
         .search-box:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            box-shadow: 0 0 0 3px rgb(0 102 204 / 0.1);
         }
 
         .btn-download {
-            background: var(--primary);
+            background: var(--success);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
+            padding: 0.5rem 1rem;
             border-radius: var(--border-radius-sm);
             font-size: 0.875rem;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            box-shadow: var(--shadow-sm);
         }
 
         .btn-download:hover {
-            background: var(--primary-dark);
+            background: #059669;
             transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
         }
 
         .table-container {
             overflow-x: auto;
-            max-height: calc(100vh - 400px);
+            max-height: 70vh;
             overflow-y: auto;
-            position: relative;
         }
 
         .data-table {
@@ -103,26 +114,23 @@
             padding-right: 0.5rem;
         }
 
-        .data-table thead {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
         .data-table th {
-            background: var(--primary-lightest);
+            background: var(--gradient-subtle);
             padding: 1rem 0.75rem;
             text-align: left;
             font-weight: 600;
             color: var(--text-primary);
-            border-bottom: 2px solid var(--primary-lighter);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
             cursor: pointer;
             user-select: none;
             transition: background-color 0.2s ease;
         }
 
         .data-table th:hover {
-            background: var(--primary-lighter);
+            background: var(--border-light);
         }
 
         .data-table th.sortable {
@@ -155,28 +163,48 @@
         }
 
         /* Stats Grid */
-            /* Statistics Container Styles - removed, using default viewer-container white background */
+            /* Statistics Container Styles */
+            .stats-container {
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border: 1px solid #e2e8f0;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
             
             .stats-header {
-                background: white;
-                color: var(--text-primary);
-                padding: 2rem 2rem 1rem 2rem;
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                color: white;
+                padding: 1.5rem 2rem;
+                border-radius: var(--border-radius) var(--border-radius) 0 0;
                 text-align: center;
-                border-bottom: 1px solid var(--border-light);
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .stats-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+                opacity: 0.3;
             }
             
             .stats-title {
                 font-size: 1.5rem;
                 font-weight: 700;
-                color: var(--text-primary);
-                margin: 0 0 0.5rem 0;
+                margin: 0 0 0.25rem 0;
+                position: relative;
+                z-index: 1;
             }
             
             .stats-subtitle {
-                font-size: 1rem;
-                color: var(--text-secondary);
+                font-size: 0.9rem;
+                opacity: 0.8;
                 font-weight: 400;
-                margin: 0;
+                position: relative;
+                z-index: 1;
             }
             
             .stats-content {
@@ -187,7 +215,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 2rem;
-                max-width: 1400px;
+                max-width: 1000px;
                 margin: 0 auto;
             }
             
@@ -209,18 +237,52 @@
             
             .stat-card {
                 background: white;
-                border: 2px solid var(--border-light);
-                border-radius: var(--border-radius);
+                border: 1px solid #e2e8f0;
+                border-radius: 12px;
                 padding: 1.5rem;
                 display: flex;
                 align-items: center;
                 gap: 1rem;
-                transition: all 0.2s ease;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .stat-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
             }
             
             .stat-card:hover {
-                border-color: var(--primary-lighter);
-                box-shadow: var(--shadow-md);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+                border-color: #3b82f6;
+            }
+            
+            .stat-card:hover::before {
+                transform: translateX(0);
+            }
+            
+            .stat-card.primary::before,
+            .stat-card.secondary::before,
+            .stat-card.tertiary::before,
+            .stat-card.highlight::before { 
+                background: linear-gradient(90deg, #64748b, #475569); 
+            }
+            
+            .stat-card.primary,
+            .stat-card.secondary,
+            .stat-card.tertiary,
+            .stat-card.highlight {
+                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                border-color: #e2e8f0;
             }
             
             .stat-card.large {
@@ -231,8 +293,7 @@
             
             .stat-card.large .stat-value {
                 font-size: 2.5rem;
-                font-weight: 800;
-                color: var(--primary);
+                font-weight: 900;
             }
             
             .stat-card.large .stat-icon {
@@ -267,19 +328,20 @@
             }
             
             .stat-label {
-                font-size: 0.75rem;
-                text-transform: uppercase;
-                letter-spacing: 0.1em;
-                color: var(--text-muted);
-                font-weight: 600;
+                font-size: 0.875rem;
+                color: #64748b;
                 margin-bottom: 0.5rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
             }
             
             .stat-value {
-                font-size: 1.75rem;
-                font-weight: 700;
-                color: var(--text-primary);
-                line-height: 1.2;
+                font-size: 2rem;
+                font-weight: 800;
+                color: #1e293b;
+                font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+                line-height: 1;
             }
             
             .stat-value.small {
@@ -338,10 +400,10 @@
             
             .cpe-list-modern .cpe-count {
                 font-weight: 700;
-                color: var(--primary);
-                background: var(--primary-lightest);
-                padding: 0.25rem 0.75rem;
-                border-radius: 6px;
+                color: #f59e0b;
+                background: #fef3c7;
+                padding: 0.25rem 0.5rem;
+                border-radius: 999px;
                 font-size: 0.75rem;
                 min-width: 2rem;
                 text-align: center;
@@ -489,21 +551,22 @@
 <body>
     <nav class="main-nav">
         <div class="nav-container">
-            <a href="index.html" class="nav-link"><span>🏠</span> Home</a>
-            <a href="dashboard.html" class="nav-link"><span>📊</span> Dashboard</a>
-            <a href="viewer.html" class="nav-link"><span>🔍</span> Explorer</a>
+            <a href="index.html#home" class="nav-link"><span>🏠</span> Home</a>
+            <a href="viewer.html" class="nav-link"><span>📊</span> Dashboard</a>
+            <a href="index.html#sources" class="nav-link"><span>🔗</span> Sources</a>
+            <a href="index.html#about" class="nav-link"><span>💡</span> About</a>
+            <a href="index.html#contact" class="nav-link"><span>✉️</span> Contact</a>
             <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="nav-link nav-link-external"><span>🌐</span> GitHub</a>
         </div>
     </nav>
+    <header class="hero-section card" id="dashboard-hero">
+        <div class="hero-content">
+            <h1 class="main-title">PatchThisApp</h1>
+            <p class="subtitle">Vulnerability Data Dashboard</p>
+            <p class="hero-description">Explore, search, and analyze the latest vulnerability intelligence. Use the dashboard below to filter, sort, and download real-time vulnerability data from trusted sources.</p>
+        </div>
+    </header>
     <main>
-        <!-- Hero Section -->
-        <header class="hero-section card" id="dashboard-hero" style="background: white; margin-top: 2rem; text-align: center;">
-            <div class="hero-content">
-                <h1 style="font-size: 2.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">Vulnerability Data Explorer</h1>
-                <p style="font-size: 1.125rem; color: var(--text-secondary); margin-bottom: 0;">Search, filter, and analyze vulnerability intelligence from trusted sources</p>
-            </div>
-        </header>
-        
         <div class="card-section">
             <div class="viewer-container">
                 <div class="viewer-header">
@@ -565,7 +628,7 @@
             </div>
         </div>
         <div class="card-section">
-            <div class="viewer-container" id="overviewStats" style="display:none; background: white;">
+            <div class="viewer-container stats-container" id="overviewStats" style="display:none;">
                 <div class="stats-header">
                     <h2 class="stats-title">Overview Statistics</h2>
                     <div class="stats-subtitle">Vulnerability Intelligence Summary</div>
