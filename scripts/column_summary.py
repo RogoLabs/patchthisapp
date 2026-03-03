@@ -1,22 +1,22 @@
 import pandas as pd
+import sys
 
 def main():
-    df = pd.read_csv('data/data.csv')
-    print('--- Vendor ---')
-    print('Non-empty count:', df['Vendor'].notna().sum())
-    print('Unique values:', df['Vendor'].nunique())
-    print('Top 10 most common:')
-    print(df['Vendor'].value_counts().head(10))
-    print('\n--- Affected Products ---')
-    print('Non-empty count:', df['Affected Products'].notna().sum())
-    print('Unique values:', df['Affected Products'].nunique())
-    print('Top 10 most common:')
-    print(df['Affected Products'].value_counts().head(10))
-    print('\n--- CVSS_Vector ---')
-    print('Non-empty count:', df['CVSS_Vector'].notna().sum())
-    print('Unique values:', df['CVSS_Vector'].nunique())
-    print('Value counts:')
-    print(df['CVSS_Vector'].value_counts())
+    try:
+        df = pd.read_csv('data/data.csv')
+    except FileNotFoundError:
+        print("Error: data/data.csv not found. Run patchthisapp.py first.")
+        sys.exit(1)
+
+    for col in ['Vendor', 'Affected Products', 'CVSS_Vector']:
+        print(f'\n--- {col} ---')
+        if col not in df.columns:
+            print(f'Column "{col}" not found in data. Available: {list(df.columns)}')
+            continue
+        print('Non-empty count:', df[col].notna().sum())
+        print('Unique values:', df[col].nunique())
+        print('Top 10 most common:')
+        print(df[col].value_counts().head(10))
 
 if __name__ == "__main__":
     main()
