@@ -6,7 +6,7 @@ import argparse
 import json
 import logging
 import pandas as pd
-from typing import List, Dict, Tuple, Any, Optional
+from typing import List, Dict, Tuple, Any
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -59,14 +59,14 @@ def load_cisa(cisa_path: Path) -> pd.DataFrame:
     df['Source'] = 'CISA'
     return df[['CVE', 'Source']]
 
-def load_epss(epss_path: Path) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def load_epss(epss_path: Path, threshold: float = 0.95) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Load EPSS data and return filtered and full datasets."""
     df = load_csv(epss_path, skiprows=1)
     if df.empty:
         return df, df
     df = df.rename(columns={"cve": "CVE"})
     df_all = df.copy()
-    df = df[df.epss > .90].copy()
+    df = df[df.epss > threshold].copy()
     df['Source'] = 'EPSS'
     return df[['CVE', 'Source']], df_all
 
@@ -84,6 +84,19 @@ def load_nvd_data(filename: Path) -> List[Dict[str, Any]]:
     except Exception as e:
         logging.error(f"Unexpected error reading NVD file {filename}: {e}")
         return []
+
+def parse_cpe_fields(cpe_string: str) -> Tuple[str, str]:
+    """Extract vendor and product from a CPE 2.3 string.
+    CPE format: cpe:2.3:part:vendor:product:version:...
+    """
+    if not cpe_string:
+        return ('', '')
+    parts = cpe_string.split(':')
+    if len(parts) >= 5:
+        vendor = parts[3].replace('_', ' ').title()
+        product = parts[4].replace('_', ' ').title()
+        return (vendor, product)
+    return ('', '')
 
 def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
     """Extract relevant CVE data from NVD entry with improved error handling."""
@@ -105,7 +118,9 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
         'cwe': 'Missing_Data',
         'description': '',
         'cpe': '',
-        'cvss_vector': ''
+        'cvss_vector': '',
+        'vendor': '',
+        'product': ''
     }
     # Extract CPEs (if present)
     try:
@@ -121,13 +136,16 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
                         cpe_list.append(cpe_uri)
         if cpe_list:
             fields['cpe'] = ';'.join(sorted(set(cpe_list)))
+            vendor, product = parse_cpe_fields(cpe_list[0])
+            fields['vendor'] = vendor
+            fields['product'] = product
     except Exception as e:
         logging.warning(f"Error extracting CPEs: {e}")
     
     try:
         cve_data = entry.get('cve', {})
         if not isinstance(cve_data, dict):
-            logging.warning(f"Invalid CVE data structure in entry")
+            logging.warning("Invalid CVE data structure in entry")
             return fields
             
         fields['cve'] = cve_data.get('id', 'Unknown')
@@ -155,22 +173,12 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
                 'cvss_vector': cvss_data.get('vectorString', cvss_data.get('attackVector', fields['cvss_vector']))
             })
         
-        # Extract CWE information (collect all CWEs and strip CWE- prefix)
+        # Extract CWE information
         weaknesses = cve_data.get('weaknesses', [])
         if weaknesses and isinstance(weaknesses, list):
-            cwe_list = []
-            for weakness in weaknesses:
-                weakness_desc = weakness.get('description', [])
-                if weakness_desc and isinstance(weakness_desc, list):
-                    for desc in weakness_desc:
-                        cwe_value = desc.get('value', '')
-                        if cwe_value and cwe_value != 'Missing_Data':
-                            # Strip CWE- prefix to keep only the number/identifier
-                            if cwe_value.startswith('CWE-'):
-                                cwe_value = cwe_value[4:]  # Remove 'CWE-' prefix
-                            cwe_list.append(cwe_value)
-            if cwe_list:
-                fields['cwe'] = ', '.join(sorted(set(cwe_list)))
+            weakness_desc = weaknesses[0].get('description', [])
+            if weakness_desc and isinstance(weakness_desc, list):
+                fields['cwe'] = weakness_desc[0].get('value', fields['cwe'])
         
         # Extract description
         descriptions = cve_data.get('descriptions', [])
@@ -225,14 +233,23 @@ def main() -> None:
     parser.add_argument('--epss', type=Path, default=Path('epss_scores-current.csv'))
     parser.add_argument('--nvd', type=Path, default=Path('nvd.jsonl'))
     parser.add_argument('--output', type=Path, default=Path('data/data.csv'))
+    parser.add_argument('--epss-threshold', type=float, default=0.95,
+                        help='EPSS score threshold (default: 0.95)')
+    parser.add_argument('--verbose', action='store_true',
+                        help='Enable verbose/debug logging')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='Report what would be produced without writing files')
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
 
     logging.info("Loading Metasploit and Nuclei data...")
     cve_sources = load_metasploit_nuclei(args.metasploit, args.nuclei)
     logging.info("Loading CISA data...")
     cisa_df = load_cisa(args.cisa)
     logging.info("Loading EPSS data...")
-    epss_df, epss_df_all = load_epss(args.epss)
+    epss_df, epss_df_all = load_epss(args.epss, args.epss_threshold)
     
     if cve_sources.empty and cisa_df.empty and epss_df.empty:
         logging.error("No CVE source data loaded. Exiting.")
@@ -252,29 +269,37 @@ def main() -> None:
     patchthisapp_df = pd.merge(cve_list, nvd, how='inner', left_on='CVE', right_on='CVE')
     if not epss_df_all.empty:
         patchthisapp_df = pd.merge(patchthisapp_df, epss_df_all, how='inner', left_on='CVE', right_on='CVE')
-        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'epss', 'Description', 'Published', 'Source', 'cwe', 'cpe']
+        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'epss', 'Description', 'Published', 'Source', 'cpe', 'vendor', 'product']
         patchthisapp_df = patchthisapp_df[columns]
-        patchthisapp_df = patchthisapp_df.rename(columns={"epss": "EPSS", "cvss_vector": "CVSS_Vector", "cwe": "CWE", "cpe": "CPE"})
+        patchthisapp_df = patchthisapp_df.rename(columns={
+            "epss": "EPSS", "cvss_vector": "CVSS_Vector", "cpe": "CPE",
+            "vendor": "Vendor", "product": "Affected Products"
+        })
     else:
-        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'Description', 'Published', 'Source', 'cwe', 'cpe']
+        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'Description', 'Published', 'Source', 'cpe', 'vendor', 'product']
         patchthisapp_df = patchthisapp_df[columns]
-        patchthisapp_df = patchthisapp_df.rename(columns={"cvss_vector": "CVSS_Vector", "cwe": "CWE", "cpe": "CPE"})
+        patchthisapp_df = patchthisapp_df.rename(columns={
+            "cvss_vector": "CVSS_Vector", "cpe": "CPE",
+            "vendor": "Vendor", "product": "Affected Products"
+        })
     
+    logging.info(f"Final dataset: {len(patchthisapp_df)} CVEs")
+    if args.dry_run:
+        logging.info("Dry run mode — no files written")
+        logging.info(f"Columns: {list(patchthisapp_df.columns)}")
+        logging.info(f"Sample:\n{patchthisapp_df.head()}")
+        return
+
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    patchthisapp_df.to_csv(args.output, index=False, encoding='utf-8', lineterminator='\n')
+    patchthisapp_df.to_csv(args.output, index=False)
     logging.info(f"Wrote output to {args.output}")
     
     # Also save a copy to the web folder for the CSV viewer
     web_csv_path = Path('web/data.csv')
     web_csv_path.parent.mkdir(parents=True, exist_ok=True)
-    patchthisapp_df.to_csv(web_csv_path, index=False, encoding='utf-8', lineterminator='\n')
+    patchthisapp_df.to_csv(web_csv_path, index=False)
     logging.info(f"Wrote web copy to {web_csv_path}")
     
-    # Also save a copy to the web/viewer folder for the CSV viewer
-    web_viewer_csv_path = Path('web/viewer/data.csv')
-    web_viewer_csv_path.parent.mkdir(parents=True, exist_ok=True)
-    patchthisapp_df.to_csv(web_viewer_csv_path, index=False, encoding='utf-8', lineterminator='\n')
-    logging.info(f"Wrote web viewer copy to {web_viewer_csv_path}")
 
 if __name__ == "__main__":
     main()
