@@ -7,169 +7,1622 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-9V606CWMWX');
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PatchThisApp</title>
+    <title>PatchThisApp - Curated Vulnerability Intelligence</title>
     <link rel="stylesheet" href="modern.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        html { scroll-behavior: smooth; }
+
+        /* ── Loading & Error States ── */
+        .app-loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .app-error {
+            background: #fff5f5;
+            border: 1px solid var(--error, #e53e3e);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            color: #c53030;
+            text-align: center;
+        }
+        .app-error button {
+            margin-top: 1rem;
+            padding: 0.5rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ── Sticky Nav ── */
+        .main-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08));
+        }
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            height: 56px;
+        }
+        .nav-link {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-radius: var(--border-radius-sm, 6px);
+            transition: color 0.2s, background 0.2s;
+        }
+        .nav-link:hover {
+            color: var(--primary);
+            background: var(--primary-lightest);
+        }
+        .nav-spacer { flex: 1; }
+        .dark-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius-sm, 6px);
+            padding: 0.4rem 0.75rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .dark-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ── Hero Section ── */
+        .hero-section {
+            text-align: center;
+            padding: 4rem 2rem 3rem;
+            max-width: 900px;
+            margin: 2rem auto 0;
+        }
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0 0 1rem 0;
+            letter-spacing: -0.02em;
+        }
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin: 0 0 1.5rem 0;
+        }
+        .hero-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin: 0 0 2.5rem 0;
+        }
+        .hero-cta {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1.125rem;
+            box-shadow: var(--shadow-lg, 0 4px 12px rgba(0,0,0,0.15));
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2.5rem;
+            background: var(--surface);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1.125rem;
+            border: 2px solid var(--border);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+        .trust-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            padding: 2rem 0 0 0;
+            border-top: 1px solid var(--border-light);
+        }
+        .trust-item { text-align: center; }
+        .trust-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        .trust-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ── Section Containers ── */
+        .spa-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin: 0 0 0.5rem 0;
+        }
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin: 0 0 2.5rem 0;
+        }
+
+        /* ── Dashboard: Stats Cards ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius, 12px);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08));
+            transition: all 0.2s ease;
+        }
+        .stat-card:hover {
+            box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1));
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        .stat-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* ── Dashboard: Charts ── */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius, 12px);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08));
+        }
+        .chart-card.full-width { grid-column: 1 / -1; }
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        .chart-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .chart-container.tall { height: 400px; }
+
+        /* ── Explorer: Search & Table ── */
+        .explorer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .search-box {
+            padding: 0.625rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius-sm, 6px);
+            font-size: 0.9rem;
+            background: var(--surface);
+            color: var(--text-primary);
+            min-width: 280px;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+        }
+
+        .table-wrapper {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius, 12px);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08));
+        }
+        .table-scroll {
+            overflow-x: auto;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        .data-table th {
+            background: var(--surface-alt, #f8fafc);
+            padding: 1rem 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-light);
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+        .data-table th:hover { background: var(--border-light); }
+        .data-table th .sort-icon {
+            display: inline-block;
+            margin-left: 0.4rem;
+            opacity: 0.3;
+            transition: opacity 0.2s, transform 0.2s;
+            vertical-align: middle;
+        }
+        .data-table th[aria-sort="ascending"] .sort-icon,
+        .data-table th[aria-sort="descending"] .sort-icon { opacity: 1; }
+        .data-table th[aria-sort="descending"] .sort-icon { transform: rotate(180deg); }
+
+        .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: top;
+        }
+        .data-table tbody tr:hover { background: var(--primary-lightest, #e3f2fd); }
+
+        .cve-cell {
+            font-family: 'SF Mono', Monaco, 'Menlo', monospace;
+            font-weight: 600;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+        .score-cell {
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .severity-critical { color: #d32f2f; }
+        .severity-high { color: var(--error, #e53e3e); }
+        .severity-medium { color: var(--warning-alt, #f59e0b); }
+        .severity-low { color: var(--success-alt, #10b981); }
+        .severity-label {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-left: 0.35rem;
+        }
+        .epss-cell {
+            text-align: center;
+            font-family: 'SF Mono', Monaco, 'Menlo', monospace;
+        }
+        .date-cell {
+            font-family: 'SF Mono', Monaco, 'Menlo', monospace;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        .source-badge {
+            font-size: 0.75rem;
+            background: var(--border-light);
+            padding: 0.2rem 0.5rem;
+            border-radius: var(--border-radius-sm, 6px);
+            display: inline-block;
+            margin: 0.1rem;
+        }
+
+        /* ── Pagination ── */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.25rem;
+            border-top: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+        .pagination button {
+            padding: 0.4rem 0.85rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            border-radius: var(--border-radius-sm, 6px);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .pagination button:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-lightest);
+        }
+        .pagination button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .pagination button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .pagination-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0 0.5rem;
+        }
+
+        /* ── Explorer: Overview Statistics Panel ── */
+        .overview-stats {
+            margin-top: 2.5rem;
+        }
+        .overview-stats-header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: var(--border-radius, 12px) var(--border-radius, 12px) 0 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .overview-stats-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        .overview-stats-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem 0;
+            position: relative;
+            z-index: 1;
+        }
+        .overview-stats-subtitle-text {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+        .overview-stats-body {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 var(--border-radius, 12px) var(--border-radius, 12px);
+            padding: 2rem;
+        }
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .overview-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+        .overview-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+        .overview-card.full-span {
+            grid-column: 1 / -1;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .overview-icon { font-size: 2rem; }
+        .overview-info { flex: 1; }
+        .overview-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .overview-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1e293b;
+            font-family: 'SF Mono', Monaco, monospace;
+            line-height: 1;
+        }
+        .overview-value.small {
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1.4;
+            background: #f1f5f9;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 0.25rem;
+            font-family: 'SF Mono', Monaco, monospace;
+            word-break: break-all;
+        }
+        .overview-header-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+        }
+        .cpe-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+        .cpe-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0.75rem 0;
+            font-size: 0.875rem;
+            color: #475569;
+            border-bottom: 1px solid #f1f5f9;
+            gap: 1rem;
+        }
+        .cpe-list li:last-child { border-bottom: none; }
+        .cpe-list li:hover {
+            background: #f8fafc;
+            margin: 0 -0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            border-radius: 6px;
+        }
+        .cpe-list .cpe-name {
+            flex: 1;
+            word-break: break-word;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.8rem;
+        }
+        .cpe-list .cpe-count {
+            font-weight: 700;
+            color: #f59e0b;
+            background: #fef3c7;
+            padding: 0.25rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            min-width: 2rem;
+            text-align: center;
+        }
+
+        /* ── Sources Section ── */
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .source-card {
+            background: var(--surface);
+            border: 1px solid var(--border-light);
+            border-radius: var(--border-radius, 12px);
+            padding: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08));
+            transition: all 0.2s;
+        }
+        .source-card:hover {
+            box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1));
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        .source-icon { font-size: 2.5rem; }
+        .source-card h3 { margin: 0 0 0.5rem 0; font-size: 1.1rem; }
+        .source-card h3 a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .source-card h3 a:hover { text-decoration: underline; }
+        .source-card p {
+            margin: 0;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        /* ── Footer ── */
+        .site-footer {
+            background: var(--dark, #1f2937);
+            color: var(--text-on-dark, #e5e7eb);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+        .site-footer a {
+            color: var(--primary-light, #64b5f6);
+            text-decoration: none;
+        }
+        .site-footer a:hover { text-decoration: underline; }
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .footer-meta {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem; }
+            .hero-subtitle { font-size: 1.25rem; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .stat-value { font-size: 2rem; }
+            .spa-section { padding: 2rem 1rem; }
+            .overview-grid { grid-template-columns: 1fr; }
+            .nav-container { padding: 0 1rem; gap: 0; }
+            .nav-link { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
+            .search-box { min-width: 100%; }
+            .explorer-header { flex-direction: column; align-items: stretch; }
+        }
+
+        /* ── Data-loaded visibility ── */
+        .data-section { display: none; }
+        .data-section.loaded { display: block; }
+    </style>
 </head>
 <body>
+
+    <!-- ════════════════════ STICKY NAV ════════════════════ -->
     <nav class="main-nav">
         <div class="nav-container">
-            <a href="index.html" class="nav-link"><span>🏠</span> Home</a>
-            <a href="dashboard.html" class="nav-link"><span>📊</span> Dashboard</a>
-            <a href="viewer.html" class="nav-link"><span>🔍</span> Explorer</a>
-            <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="nav-link nav-link-external"><span>🌐</span> GitHub</a>
+            <a href="#hero" class="nav-link">Home</a>
+            <a href="#dashboard" class="nav-link">Dashboard</a>
+            <a href="#explorer" class="nav-link">Explorer</a>
+            <a href="#sources" class="nav-link">Sources</a>
+            <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="nav-link">GitHub</a>
+            <span class="nav-spacer"></span>
+            <button class="dark-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">Dark Mode</button>
         </div>
     </nav>
+
     <main>
-        <!-- Hero Section -->
-        <header class="hero-section card" id="home" style="background: white; margin-top: 2rem;">
-            <div class="hero-content">
-                <h1 style="font-size: 3rem; font-weight: 800; color: #1f2937; margin: 0 0 1rem 0; letter-spacing: -0.02em;">PatchThisApp</h1>
-                <p style="font-size: 1.5rem; color: var(--primary); font-weight: 600; margin: 0 0 1.5rem 0;">Curated Vulnerability Intelligence</p>
-                <p style="font-size: 1.125rem; color: var(--text-secondary); line-height: 1.7; margin: 0 0 2.5rem 0;">
-                    Stop drowning in CVEs. Get actionable intelligence from CISA KEV, Metasploit, Nuclei, and EPSS—curated for security teams who need to know what to patch first.
-                </p>
-                
-                <!-- Primary CTA -->
-                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem;">
-                    <a href="dashboard.html" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2.5rem; background: var(--primary); color: white; text-decoration: none; border-radius: var(--border-radius); font-weight: 600; font-size: 1.125rem; box-shadow: var(--shadow-lg); transition: all 0.2s; border: none;">
-                        View Analytics Dashboard
-                    </a>
-                    <a href="data.csv" download style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2.5rem; background: var(--surface); color: var(--text-primary); text-decoration: none; border-radius: var(--border-radius); font-weight: 600; font-size: 1.125rem; border: 2px solid var(--border); transition: all 0.2s;">
-                        ⬇️ Download CSV
-                    </a>
+
+        <!-- ════════════════════ HERO ════════════════════ -->
+        <section id="hero" class="hero-section card">
+            <h1 class="hero-title">PatchThisApp</h1>
+            <p class="hero-subtitle">Curated Vulnerability Intelligence</p>
+            <p class="hero-description">
+                Stop drowning in CVEs. Get actionable intelligence from CISA KEV, Metasploit, Nuclei, and EPSS — curated for security teams who need to know what to patch first.
+            </p>
+
+            <div class="hero-cta">
+                <a href="#dashboard" class="btn-primary">View Analytics Dashboard</a>
+                <a href="#explorer" class="btn-secondary">Browse Data</a>
+                <a href="data.csv" download class="btn-secondary">Download CSV</a>
+            </div>
+
+            <div class="trust-indicators">
+                <div class="trust-item">
+                    <div class="trust-label">Refreshed</div>
+                    <div class="trust-value">Every 6 Hours</div>
                 </div>
-                
-                <!-- Trust Indicators -->
-                <div style="display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; padding: 2rem 0 0 0; border-top: 1px solid var(--border-light);">
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; font-weight: 600;">Refreshed</div>
-                        <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">Every 6 Hours</div>
+                <div class="trust-item">
+                    <div class="trust-label">Sources</div>
+                    <div class="trust-value">4 Trusted Feeds</div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-label">Format</div>
+                    <div class="trust-value">100% Open Source</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════ LOADING STATE ════════════════════ -->
+        <div id="appLoading" class="app-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading vulnerability data...</p>
+        </div>
+
+        <!-- ════════════════════ ERROR STATE ════════════════════ -->
+        <div id="appError" class="app-error" style="display:none;">
+            <p>Failed to load vulnerability data. Please try again.</p>
+            <button onclick="loadData()">Retry</button>
+        </div>
+
+        <!-- ════════════════════ DASHBOARD ════════════════════ -->
+        <section id="dashboard" class="spa-section data-section">
+            <h2 class="section-title">Vulnerability Analytics Dashboard</h2>
+            <p class="section-subtitle">Real-time vulnerability intelligence and trend analysis</p>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Vulnerabilities</div>
+                    <div class="stat-value" id="totalVulns">&mdash;</div>
+                    <div class="stat-description">CVEs tracked</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">High Severity</div>
+                    <div class="stat-value" id="highSeverity">&mdash;</div>
+                    <div class="stat-description">CVSS &ge; 7.0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Critical CVEs</div>
+                    <div class="stat-value" id="criticalCVEs">&mdash;</div>
+                    <div class="stat-description">CVSS &ge; 9.0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Average CVSS</div>
+                    <div class="stat-value" id="avgCVSS">&mdash;</div>
+                    <div class="stat-description">Mean severity score</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <!-- Timeline -->
+                <div class="chart-card full-width">
+                    <h3 class="chart-title">Vulnerability Timeline (Last 6 Months)</h3>
+                    <div class="chart-container tall">
+                        <canvas id="timelineChart"></canvas>
                     </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; font-weight: 600;">Sources</div>
-                        <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">4 Trusted Feeds</div>
+                </div>
+
+                <!-- Intelligence Feed Overlap -->
+                <div class="chart-card full-width">
+                    <h3 class="chart-title">Intelligence Feed Overlap</h3>
+                    <p class="chart-description">Shows CVEs appearing in single vs. multiple intelligence feeds</p>
+                    <div class="chart-container">
+                        <canvas id="sourceChart"></canvas>
                     </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; font-weight: 600;">Format</div>
-                        <div style="font-size: 1rem; font-weight: 700; color: var(--text-primary);">100% Open Source</div>
+                </div>
+
+                <!-- CVSS Distribution -->
+                <div class="chart-card full-width">
+                    <h3 class="chart-title">CVSS Score Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="cvssChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Attack Vector -->
+                <div class="chart-card full-width">
+                    <h3 class="chart-title">Attack Vector Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="vectorChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- EPSS Risk Levels -->
+                <div class="chart-card full-width">
+                    <h3 class="chart-title">EPSS Risk Levels</h3>
+                    <div class="chart-container">
+                        <canvas id="epssChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top 10 Products -->
+                <div class="chart-card full-width">
+                    <h3 class="chart-title">Top 10 Most Affected Products</h3>
+                    <div class="chart-container">
+                        <canvas id="productsChart"></canvas>
                     </div>
                 </div>
             </div>
-        </header>
-        
-        <div class="card-section">
-            <!-- Value Proposition -->
-            <section class="feature-section card" style="background: white;">
-                <h2 style="text-align: center; margin-bottom: 1rem;">Why PatchThisApp?</h2>
-                <p style="text-align: center; color: var(--text-secondary); font-size: 1.125rem; margin: 0 auto 3rem;">
-                    Not all CVEs are created equal. We filter the signal from the noise.
-                </p>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🎯</div>
-                        <h3 style="margin: 0 0 0.75rem 0; font-size: 1.25rem; color: var(--text-primary);">Focus on What Matters</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6; margin: 0;">
-                            Only vulnerabilities with active exploits, public PoCs, or high exploit probability (EPSS &gt; 0.90).
-                        </p>
-                    </div>
-                    
-                    <div style="text-align: center;">
-                        <div style="font-size: 2.5rem; margin-bottom: 1rem;">⚡</div>
-                        <h3 style="margin: 0 0 0.75rem 0; font-size: 1.25rem; color: var(--text-primary);">Always Up to Date</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6; margin: 0;">
-                            Automated data collection from 4 trusted sources, refreshed every 6 hours around the clock.
-                        </p>
-                    </div>
-                    
-                    <div style="text-align: center;">
-                        <div style="font-size: 2.5rem; margin-bottom: 1rem;">🔓</div>
-                        <h3 style="margin: 0 0 0.75rem 0; font-size: 1.25rem; color: var(--text-primary);">Free & Open Source</h3>
-                        <p style="color: var(--text-secondary); line-height: 1.6; margin: 0;">
-                            No registration, no API keys, no paywalls. Use the dashboard, download the CSV, or fork the code.
-                        </p>
-                    </div>
-                </div>
-            </section>
+        </section>
 
-            <!-- Intelligence Sources -->
-            <section id="sources" class="feature-section card">
-                <h2 style="text-align: center;">Trusted Intelligence Sources</h2>
-                <p style="text-align: center; color: var(--text-secondary); font-size: 1.125rem; margin: 0 auto 2.5rem;">
-                    Our data comes from four industry-leading vulnerability intelligence feeds
-                </p>
-                <div class="features-grid intelligence-grid">
-                    <div class="feature-card intelligence-card">
-                        <div class="feature-icon">🛡️</div>
-                        <div>
-                            <h3><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank">CISA KEV Catalog</a></h3>
-                            <p>Live feed of known exploited vulnerabilities actively targeted in the wild.</p>
-                        </div>
-                    </div>
-                    <div class="feature-card intelligence-card">
-                        <div class="feature-icon">⚡</div>
-                        <div>
-                            <h3><a href="https://docs.rapid7.com/metasploit/modules/" target="_blank">Rapid7 Metasploit</a></h3>
-                            <p>Battle-tested exploit modules for real-world attack simulation and validation.</p>
-                        </div>
-                    </div>
-                    <div class="feature-card intelligence-card">
-                        <div class="feature-icon">🔍</div>
-                        <div>
-                            <h3><a href="https://github.com/projectdiscovery/nuclei-templates" target="_blank">Nuclei Templates</a></h3>
-                            <p>Community-driven detection templates for automated, scalable vulnerability scanning.</p>
-                        </div>
-                    </div>
-                    <div class="feature-card intelligence-card">
-                        <div class="feature-icon">📊</div>
-                        <div>
-                            <h3><a href="https://www.first.org/epss/" target="_blank">EPSS Scoring</a></h3>
-                            <p>Machine learning-driven exploit prediction scores for smarter, data-driven prioritization.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <!-- ════════════════════ EXPLORER ════════════════════ -->
+        <section id="explorer" class="spa-section data-section">
+            <h2 class="section-title">Data Explorer</h2>
+            <p class="section-subtitle">Search, sort, and analyze the full vulnerability dataset</p>
 
-            <!-- Get Started CTA -->
-            <section class="feature-section card" style="background: white; text-align: center;">
-                <h2 style="color: var(--text-primary); margin-bottom: 1rem;">Ready to Get Started?</h2>
-                <p style="color: var(--text-secondary); font-size: 1.125rem; margin: 0 auto 2rem;">
-                    View interactive analytics or download the raw data—it's your choice.
-                </p>
-                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-                    <a href="dashboard.html" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: var(--primary); color: white; text-decoration: none; border-radius: var(--border-radius); font-weight: 600; font-size: 1.125rem; box-shadow: var(--shadow-md); transition: all 0.2s;">
-                        📊 View Dashboard
-                    </a>
-                    <a href="viewer.html" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: var(--surface); color: var(--primary); text-decoration: none; border-radius: var(--border-radius); font-weight: 600; font-size: 1.125rem; border: 2px solid var(--border); transition: all 0.2s;">
-                        🔍 Browse Data
-                    </a>
-                </div>
-            </section>
+            <div class="explorer-header">
+                <input type="text" id="searchInput" class="search-box" placeholder="Search CVEs, products, sources..." aria-label="Search vulnerabilities">
+                <a href="data.csv" download="patchthisapp-data.csv" class="btn-primary" style="padding:0.65rem 1.5rem; font-size:0.9rem;">
+                    Download CSV
+                </a>
+            </div>
 
-            <!-- About & Contact -->
-            <section id="contact" class="contact-section card" style="text-align: center;">
-                <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 2rem;">
-                    A <a href="https://rogolabs.net/" target="_blank" style="color: var(--primary); font-weight: 600;">RogoLabs</a> project, originally created by <a href="https://www.jerrygamblin.com" target="_blank" style="color: var(--primary); font-weight: 600;">Jerry Gamblin</a>
-                </p>
-                <div class="contact-links">
-                    <a href="https://github.com/RogoLabs/patchthisapp/issues" target="_blank" class="contact-link">💬 Report Issues</a>
-                    <a href="https://github.com/RogoLabs/patchthisapp" target="_blank" class="contact-link">⭐ Star on GitHub</a>
-                    <a href="https://rogolabs.net/" target="_blank" class="contact-link">🌐 RogoLabs</a>
+            <div class="table-wrapper">
+                <div class="table-scroll">
+                    <table class="data-table" role="grid" aria-label="Vulnerability data">
+                        <thead>
+                            <tr>
+                                <th scope="col" data-column="CVE" aria-sort="none">
+                                    CVE
+                                    <span class="sort-icon" aria-hidden="true">&#9662;</span>
+                                </th>
+                                <th scope="col" data-column="CVSS Score" aria-sort="none">
+                                    CVSS Score
+                                    <span class="sort-icon" aria-hidden="true">&#9662;</span>
+                                </th>
+                                <th scope="col" data-column="EPSS" aria-sort="none">
+                                    EPSS
+                                    <span class="sort-icon" aria-hidden="true">&#9662;</span>
+                                </th>
+                                <th scope="col" data-column="Published" aria-sort="descending">
+                                    Published
+                                    <span class="sort-icon" aria-hidden="true">&#9662;</span>
+                                </th>
+                                <th scope="col" data-column="Source" aria-sort="none">
+                                    Source
+                                    <span class="sort-icon" aria-hidden="true">&#9662;</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
                 </div>
-            </section>
-        </div>
+                <div id="paginationControls" class="pagination"></div>
+            </div>
+
+            <!-- Overview Statistics Panel -->
+            <div class="overview-stats" id="overviewStats">
+                <div class="overview-stats-header">
+                    <h3 class="overview-stats-title">Overview Statistics</h3>
+                    <div class="overview-stats-subtitle-text">Vulnerability Intelligence Summary</div>
+                </div>
+                <div class="overview-stats-body">
+                    <div class="overview-grid">
+                        <div class="overview-card">
+                            <div class="overview-icon" aria-hidden="true">&#x1F6E1;&#xFE0F;</div>
+                            <div class="overview-info">
+                                <div class="overview-label">Total Vulnerabilities</div>
+                                <div class="overview-value" id="statTotal">&mdash;</div>
+                            </div>
+                        </div>
+                        <div class="overview-card">
+                            <div class="overview-icon" aria-hidden="true">&#x1F4CA;</div>
+                            <div class="overview-info">
+                                <div class="overview-label">Unique Products</div>
+                                <div class="overview-value" id="statCPEs">&mdash;</div>
+                            </div>
+                        </div>
+                        <div class="overview-card full-span">
+                            <div class="overview-header-row">
+                                <div class="overview-icon" aria-hidden="true">&#x26A1;</div>
+                                <div class="overview-label">Most Common Attack Vector</div>
+                            </div>
+                            <div class="overview-value small" id="statVector">&mdash;</div>
+                        </div>
+                        <div class="overview-card full-span">
+                            <div class="overview-header-row">
+                                <div class="overview-icon" aria-hidden="true">&#x1F3AF;</div>
+                                <div class="overview-label">Top 5 Most Affected Products</div>
+                            </div>
+                            <ul id="statCPEList" class="cpe-list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ════════════════════ SOURCES ════════════════════ -->
+        <section id="sources" class="spa-section">
+            <h2 class="section-title">Trusted Intelligence Sources</h2>
+            <p class="section-subtitle">Our data comes from four industry-leading vulnerability intelligence feeds</p>
+            <div class="sources-grid">
+                <div class="source-card">
+                    <div class="source-icon" aria-hidden="true">&#x1F6E1;&#xFE0F;</div>
+                    <div>
+                        <h3><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank">CISA KEV Catalog</a></h3>
+                        <p>Live feed of known exploited vulnerabilities actively targeted in the wild.</p>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <div class="source-icon" aria-hidden="true">&#x26A1;</div>
+                    <div>
+                        <h3><a href="https://docs.rapid7.com/metasploit/modules/" target="_blank">Rapid7 Metasploit</a></h3>
+                        <p>Battle-tested exploit modules for real-world attack simulation and validation.</p>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <div class="source-icon" aria-hidden="true">&#x1F50D;</div>
+                    <div>
+                        <h3><a href="https://github.com/projectdiscovery/nuclei-templates" target="_blank">Nuclei Templates</a></h3>
+                        <p>Community-driven detection templates for automated, scalable vulnerability scanning.</p>
+                    </div>
+                </div>
+                <div class="source-card">
+                    <div class="source-icon" aria-hidden="true">&#x1F4CA;</div>
+                    <div>
+                        <h3><a href="https://www.first.org/epss/" target="_blank">EPSS Scoring</a></h3>
+                        <p>Machine learning-driven exploit prediction scores for smarter, data-driven prioritization.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
-    <footer>
+
+    <!-- ════════════════════ FOOTER ════════════════════ -->
+    <footer class="site-footer">
         <div class="footer-content">
-            <span>&copy; 2025 RogoLabs. All rights reserved.</span>
-            <span class="footer-meta">v1.0 | <a href="https://rogolabs.net/" target="_blank">RogoLabs</a></span>
+            <span>&copy; 2026 <a href="https://rogolabs.net/" target="_blank">RogoLabs</a>. All rights reserved.</span>
+            <span class="footer-meta"><a href="https://github.com/RogoLabs/patchthisapp" target="_blank">GitHub</a></span>
         </div>
     </footer>
+
+    <!-- ════════════════════ LIBRARIES ════════════════════ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
+
+    <script>
+    /* ═══════════════════════════════════════════════════════
+       Dark Mode
+       ═══════════════════════════════════════════════════════ */
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme',
+            document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+        );
+    }
+    if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       Chart.js Defaults & Color Palette
+       ═══════════════════════════════════════════════════════ */
+    Chart.defaults.plugins.title.color = '#212529';
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+    Chart.defaults.plugins.tooltip.titleColor = '#212529';
+    Chart.defaults.plugins.tooltip.bodyColor = '#6c757d';
+    Chart.defaults.plugins.tooltip.borderColor = '#dee2e6';
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+
+    var colors = {
+        primary: '#2196f3',
+        primaryDark: '#1e88e5',
+        secondary: '#64b5f6',
+        tertiary: '#90caf9',
+        success: '#81c784',
+        warning: '#ffb74d',
+        danger: '#f06292',
+        info: '#60a5fa',
+        chartGradient: [
+            '#e3f2fd', '#d6e7f5', '#c8dff0', '#b9d7eb', '#aacfe6',
+            '#9bc7e1', '#8cbfdc', '#7db7d7', '#6eafd2', '#5fa7cd',
+            '#509fc8', '#4197c3'
+        ]
+    };
+
+    /* ═══════════════════════════════════════════════════════
+       State
+       ═══════════════════════════════════════════════════════ */
+    var allData = [];
+    var filteredData = [];
+    var charts = {};
+    var currentSort = { column: 'Published', direction: 'desc' };
+
+    var ROWS_PER_PAGE = 50;
+    var currentPage = 1;
+
+    /* ═══════════════════════════════════════════════════════
+       Data Loading (single fetch, shared)
+       ═══════════════════════════════════════════════════════ */
+    async function loadData() {
+        document.getElementById('appLoading').style.display = 'block';
+        document.getElementById('appError').style.display = 'none';
+        document.querySelectorAll('.data-section').forEach(function(s) { s.classList.remove('loaded'); });
+
+        try {
+            var response = await fetch('./data.csv');
+            if (!response.ok) throw new Error('Failed to fetch data');
+
+            var csvText = await response.text();
+            var parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+            if (parsed.errors.length) throw new Error('CSV parsing error');
+
+            allData = parsed.data;
+            filteredData = allData.slice();
+
+            document.getElementById('appLoading').style.display = 'none';
+            document.querySelectorAll('.data-section').forEach(function(s) { s.classList.add('loaded'); });
+
+            // Populate dashboard
+            populateDashboard();
+            // Populate explorer
+            sortData(currentSort.column, currentSort.direction);
+            updateSortIndicators();
+            updateOverviewStats(allData);
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('appLoading').style.display = 'none';
+            document.getElementById('appError').style.display = 'block';
+        }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       DASHBOARD — Stats & Charts
+       ═══════════════════════════════════════════════════════ */
+    function populateDashboard() {
+        var totalVulns = allData.length;
+        var highSeverity = allData.filter(function(r) { return parseFloat(r['CVSS Score']) >= 7.0; }).length;
+        var criticalCVEs = allData.filter(function(r) { return parseFloat(r['CVSS Score']) >= 9.0; }).length;
+        var avgCVSS = (allData.reduce(function(s, r) { return s + (parseFloat(r['CVSS Score']) || 0); }, 0) / totalVulns).toFixed(1);
+
+        document.getElementById('totalVulns').textContent = totalVulns.toLocaleString();
+        document.getElementById('highSeverity').textContent = highSeverity.toLocaleString();
+        document.getElementById('criticalCVEs').textContent = criticalCVEs.toLocaleString();
+        document.getElementById('avgCVSS').textContent = avgCVSS;
+
+        createTimelineChart();
+        createSourceChart();
+        createCVSSChart();
+        createVectorChart();
+        createEPSSChart();
+        createProductsChart();
+    }
+
+    /* ── Timeline Chart ── */
+    function createTimelineChart() {
+        var monthCounts = {};
+        var sixMonthsAgo = dayjs().subtract(6, 'month');
+
+        allData.forEach(function(row) {
+            var date = dayjs(row.Published);
+            if (date.isAfter(sixMonthsAgo)) {
+                var monthKey = date.format('YYYY-MM');
+                monthCounts[monthKey] = (monthCounts[monthKey] || 0) + 1;
+            }
+        });
+
+        var sortedMonths = Object.keys(monthCounts).sort();
+        var labels = sortedMonths.map(function(m) { return dayjs(m).format('MMM YYYY'); });
+        var data = sortedMonths.map(function(m) { return monthCounts[m]; });
+
+        var ctx = document.getElementById('timelineChart').getContext('2d');
+        charts.timeline = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Vulnerabilities Published',
+                    data: data,
+                    borderColor: colors.primary,
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    x: { grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+    }
+
+    /* ── Intelligence Feed Overlap (Source) Chart ── */
+    function createSourceChart() {
+        var sourceComboCount = {};
+
+        allData.forEach(function(row) {
+            var sourceStr = row.Source || '';
+            var sources = sourceStr.split('/').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+            var numSources = sources.length;
+
+            var category;
+            if (numSources === 0) category = 'Unknown';
+            else if (numSources === 1) category = sources[0] + ' Only';
+            else if (numSources === 2) category = 'Two Feeds';
+            else if (numSources === 3) category = 'Three Feeds';
+            else category = 'All Four Feeds';
+
+            sourceComboCount[category] = (sourceComboCount[category] || 0) + 1;
+        });
+
+        var totalCVEs = allData.length;
+        var sortedEntries = Object.entries(sourceComboCount).sort(function(a, b) { return b[1] - a[1]; });
+        var labels = sortedEntries.map(function(entry) {
+            var percentage = ((entry[1] / totalCVEs) * 100).toFixed(1);
+            return entry[0] + ' (' + percentage + '%)';
+        });
+        var data = sortedEntries.map(function(entry) { return entry[1]; });
+
+        var ctx = document.getElementById('sourceChart').getContext('2d');
+        charts.source = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        colors.primary, colors.secondary, colors.tertiary,
+                        colors.warning, colors.success, '#9e9e9e'
+                    ],
+                    borderWidth: 3,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20, font: { size: 14 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var value = context.parsed;
+                                var percentage = ((value / totalCVEs) * 100).toFixed(1);
+                                var category = sortedEntries[context.dataIndex][0];
+                                return category + ': ' + value.toLocaleString() + ' CVEs (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /* ── CVSS Distribution Chart ── */
+    function createCVSSChart() {
+        var cvssRanges = {
+            'Low (0-3.9)': 0,
+            'Medium (4-6.9)': 0,
+            'High (7-8.9)': 0,
+            'Critical (9-10)': 0
+        };
+
+        allData.forEach(function(row) {
+            var score = parseFloat(row['CVSS Score']) || 0;
+            if (score < 4) cvssRanges['Low (0-3.9)']++;
+            else if (score < 7) cvssRanges['Medium (4-6.9)']++;
+            else if (score < 9) cvssRanges['High (7-8.9)']++;
+            else cvssRanges['Critical (9-10)']++;
+        });
+
+        var ctx = document.getElementById('cvssChart').getContext('2d');
+        charts.cvss = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(cvssRanges),
+                datasets: [{
+                    label: 'Count',
+                    data: Object.values(cvssRanges),
+                    backgroundColor: [colors.tertiary, colors.warning, colors.danger, '#d32f2f'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    /* ── Attack Vector Chart ── */
+    function createVectorChart() {
+        var vectorCounts = {};
+        allData.forEach(function(row) {
+            var vector = row['CVSS_Vector'] || 'Unknown';
+            vectorCounts[vector] = (vectorCounts[vector] || 0) + 1;
+        });
+
+        var sortedVectors = Object.entries(vectorCounts)
+            .sort(function(a, b) { return b[1] - a[1]; })
+            .slice(0, 5);
+
+        var ctx = document.getElementById('vectorChart').getContext('2d');
+        charts.vector = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: sortedVectors.map(function(v) { return v[0]; }),
+                datasets: [{
+                    data: sortedVectors.map(function(v) { return v[1]; }),
+                    backgroundColor: [
+                        colors.primary, colors.secondary, colors.tertiary,
+                        colors.warning, colors.success
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+    }
+
+    /* ── EPSS Risk Levels Chart ── */
+    function createEPSSChart() {
+        var epssRanges = {
+            'Low (0-0.5)': 0,
+            'Medium (0.5-0.8)': 0,
+            'High (0.8-0.90)': 0,
+            'Critical (>0.90)': 0
+        };
+
+        allData.forEach(function(row) {
+            var epss = parseFloat(row['EPSS']) || 0;
+            if (epss < 0.5) epssRanges['Low (0-0.5)']++;
+            else if (epss < 0.8) epssRanges['Medium (0.5-0.8)']++;
+            else if (epss <= 0.90) epssRanges['High (0.8-0.90)']++;
+            else epssRanges['Critical (>0.90)']++;
+        });
+
+        var ctx = document.getElementById('epssChart').getContext('2d');
+        charts.epss = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(epssRanges),
+                datasets: [{
+                    label: 'Count',
+                    data: Object.values(epssRanges),
+                    backgroundColor: [colors.tertiary, colors.warning, colors.danger, '#d32f2f'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    /* ── Top 10 Products Chart ── */
+    function createProductsChart() {
+        var cpeCounts = {};
+        allData.forEach(function(row) {
+            if (row.CPE) {
+                row.CPE.split(';').forEach(function(cpe) {
+                    var trimmed = cpe.trim();
+                    if (trimmed) cpeCounts[trimmed] = (cpeCounts[trimmed] || 0) + 1;
+                });
+            }
+        });
+
+        var top10 = Object.entries(cpeCounts)
+            .sort(function(a, b) { return b[1] - a[1]; })
+            .slice(0, 10);
+
+        var ctx = document.getElementById('productsChart').getContext('2d');
+        charts.products = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: top10.map(function(p) { return p[0].length > 50 ? p[0].substring(0, 50) + '...' : p[0]; }),
+                datasets: [{
+                    label: 'Vulnerabilities',
+                    data: top10.map(function(p) { return p[1]; }),
+                    backgroundColor: colors.chartGradient.slice(0, 10),
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       EXPLORER — Table, Search, Sort, Pagination
+       ═══════════════════════════════════════════════════════ */
+
+    /* ── Sort ── */
+    function sortData(column, direction) {
+        currentSort = { column: column, direction: direction };
+
+        filteredData.sort(function(a, b) {
+            var aVal = a[column] || '';
+            var bVal = b[column] || '';
+
+            if (column === 'CVSS Score' || column === 'EPSS') {
+                aVal = parseFloat(aVal) || 0;
+                bVal = parseFloat(bVal) || 0;
+            } else if (column === 'Published') {
+                aVal = new Date(aVal);
+                bVal = new Date(bVal);
+                if (isNaN(aVal.getTime())) aVal = new Date(0);
+                if (isNaN(bVal.getTime())) bVal = new Date(0);
+            } else {
+                aVal = aVal.toString().toLowerCase();
+                bVal = bVal.toString().toLowerCase();
+            }
+
+            var cmp = 0;
+            if (aVal < bVal) cmp = -1;
+            else if (aVal > bVal) cmp = 1;
+
+            return direction === 'desc' ? -cmp : cmp;
+        });
+
+        currentPage = 1;
+        renderPage(filteredData, currentPage);
+    }
+
+    function updateSortIndicators() {
+        document.querySelectorAll('.data-table th[data-column]').forEach(function(th) {
+            if (th.dataset.column === currentSort.column) {
+                th.setAttribute('aria-sort', currentSort.direction === 'asc' ? 'ascending' : 'descending');
+            } else {
+                th.setAttribute('aria-sort', 'none');
+            }
+        });
+    }
+
+    function handleSort(column) {
+        var direction = 'asc';
+        if (currentSort.column === column) {
+            direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        }
+        sortData(column, direction);
+        updateSortIndicators();
+    }
+
+    /* ── Pagination ── */
+    function renderPage(data, page) {
+        var start = (page - 1) * ROWS_PER_PAGE;
+        var end = start + ROWS_PER_PAGE;
+        var pageData = data.slice(start, end);
+        renderTableRows(pageData);
+        renderPaginationControls(data.length, page);
+    }
+
+    function renderTableRows(rows) {
+        var tbody = document.getElementById('tableBody');
+        // Clear all child nodes safely
+        while (tbody.firstChild) { tbody.removeChild(tbody.firstChild); }
+
+        rows.forEach(function(row) {
+            var tr = document.createElement('tr');
+
+            // CVE
+            var cveTd = document.createElement('td');
+            cveTd.className = 'cve-cell';
+            cveTd.textContent = row.CVE || '';
+            tr.appendChild(cveTd);
+
+            // CVSS Score with severity label (text + color, not color-only)
+            var scoreTd = document.createElement('td');
+            scoreTd.className = 'score-cell';
+            var score = parseFloat(row['CVSS Score'] || '0');
+            if (score > 0) {
+                var severityClass, severityText;
+                if (score >= 9.0) { severityClass = 'severity-critical'; severityText = 'Critical'; }
+                else if (score >= 7.0) { severityClass = 'severity-high'; severityText = 'High'; }
+                else if (score >= 4.0) { severityClass = 'severity-medium'; severityText = 'Medium'; }
+                else { severityClass = 'severity-low'; severityText = 'Low'; }
+                scoreTd.classList.add(severityClass);
+
+                var scoreText = document.createTextNode(score.toFixed(1) + ' ');
+                scoreTd.appendChild(scoreText);
+
+                var labelSpan = document.createElement('span');
+                labelSpan.className = 'severity-label ' + severityClass;
+                labelSpan.textContent = severityText;
+                scoreTd.appendChild(labelSpan);
+            } else {
+                scoreTd.textContent = 'N/A';
+            }
+            tr.appendChild(scoreTd);
+
+            // EPSS
+            var epssTd = document.createElement('td');
+            epssTd.className = 'epss-cell';
+            var epss = parseFloat(row.EPSS || '0');
+            epssTd.textContent = epss > 0 ? epss.toFixed(3) : 'N/A';
+            tr.appendChild(epssTd);
+
+            // Published
+            var dateTd = document.createElement('td');
+            dateTd.className = 'date-cell';
+            var date = new Date(row.Published);
+            dateTd.textContent = isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString();
+            tr.appendChild(dateTd);
+
+            // Source
+            var sourceTd = document.createElement('td');
+            var sources = (row.Source || '').split('/');
+            sources.forEach(function(source) {
+                if (source.trim()) {
+                    var span = document.createElement('span');
+                    span.className = 'source-badge';
+                    span.textContent = source.trim();
+                    sourceTd.appendChild(span);
+                }
+            });
+            tr.appendChild(sourceTd);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderPaginationControls(totalRows, page) {
+        var container = document.getElementById('paginationControls');
+        // Clear safely
+        while (container.firstChild) { container.removeChild(container.firstChild); }
+
+        var totalPages = Math.ceil(totalRows / ROWS_PER_PAGE);
+        if (totalPages <= 1) {
+            var infoOnly = document.createElement('span');
+            infoOnly.className = 'pagination-info';
+            infoOnly.textContent = 'Showing ' + totalRows + ' of ' + totalRows + ' results';
+            container.appendChild(infoOnly);
+            return;
+        }
+
+        // Info text
+        var start = (page - 1) * ROWS_PER_PAGE + 1;
+        var end = Math.min(page * ROWS_PER_PAGE, totalRows);
+        var info = document.createElement('span');
+        info.className = 'pagination-info';
+        info.textContent = 'Showing ' + start + '-' + end + ' of ' + totalRows.toLocaleString();
+        container.appendChild(info);
+
+        // Previous button
+        var prevBtn = document.createElement('button');
+        prevBtn.textContent = 'Previous';
+        prevBtn.disabled = page === 1;
+        prevBtn.addEventListener('click', function() { currentPage--; renderPage(filteredData, currentPage); });
+        container.appendChild(prevBtn);
+
+        // Page number buttons (show max 7 pages with ellipsis)
+        var maxButtons = 7;
+        var startPage = Math.max(1, page - Math.floor(maxButtons / 2));
+        var endPage = Math.min(totalPages, startPage + maxButtons - 1);
+        if (endPage - startPage < maxButtons - 1) {
+            startPage = Math.max(1, endPage - maxButtons + 1);
+        }
+
+        if (startPage > 1) {
+            var firstBtn = document.createElement('button');
+            firstBtn.textContent = '1';
+            firstBtn.addEventListener('click', function() { currentPage = 1; renderPage(filteredData, currentPage); });
+            container.appendChild(firstBtn);
+            if (startPage > 2) {
+                var ellipsis1 = document.createElement('span');
+                ellipsis1.className = 'pagination-info';
+                ellipsis1.textContent = '...';
+                container.appendChild(ellipsis1);
+            }
+        }
+
+        for (var i = startPage; i <= endPage; i++) {
+            (function(pageNum) {
+                var btn = document.createElement('button');
+                btn.textContent = pageNum;
+                if (pageNum === page) btn.classList.add('active');
+                btn.addEventListener('click', function() { currentPage = pageNum; renderPage(filteredData, currentPage); });
+                container.appendChild(btn);
+            })(i);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                var ellipsis2 = document.createElement('span');
+                ellipsis2.className = 'pagination-info';
+                ellipsis2.textContent = '...';
+                container.appendChild(ellipsis2);
+            }
+            var lastBtn = document.createElement('button');
+            lastBtn.textContent = totalPages;
+            lastBtn.addEventListener('click', function() { currentPage = totalPages; renderPage(filteredData, currentPage); });
+            container.appendChild(lastBtn);
+        }
+
+        // Next button
+        var nextBtn = document.createElement('button');
+        nextBtn.textContent = 'Next';
+        nextBtn.disabled = page === totalPages;
+        nextBtn.addEventListener('click', function() { currentPage++; renderPage(filteredData, currentPage); });
+        container.appendChild(nextBtn);
+    }
+
+    /* ── Search ── */
+    function filterData(searchTerm) {
+        if (!searchTerm) {
+            filteredData = allData.slice();
+        } else {
+            var term = searchTerm.toLowerCase();
+            filteredData = allData.filter(function(row) {
+                return Object.values(row).some(function(value) {
+                    return value.toString().toLowerCase().includes(term);
+                });
+            });
+        }
+        currentPage = 1;
+        sortData(currentSort.column, currentSort.direction);
+    }
+
+    /* ── Overview Statistics Panel ── */
+    function updateOverviewStats(data) {
+        document.getElementById('statTotal').textContent = data.length.toLocaleString();
+
+        // Unique CPEs and top CPEs
+        var cpeCounts = {};
+        data.forEach(function(row) {
+            if (row['CPE'] && row['CPE'].trim()) {
+                row['CPE'].split(';').forEach(function(cpe) {
+                    var c = cpe.trim();
+                    if (c) cpeCounts[c] = (cpeCounts[c] || 0) + 1;
+                });
+            }
+        });
+        document.getElementById('statCPEs').textContent = Object.keys(cpeCounts).length.toLocaleString();
+
+        // Top 5 CPEs
+        var cpeList = document.getElementById('statCPEList');
+        while (cpeList.firstChild) { cpeList.removeChild(cpeList.firstChild); }
+
+        var topCPEs = Object.entries(cpeCounts).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 5);
+        if (topCPEs.length === 0) {
+            var li = document.createElement('li');
+            li.textContent = 'No data available.';
+            cpeList.appendChild(li);
+        } else {
+            topCPEs.forEach(function(entry) {
+                var li = document.createElement('li');
+
+                var nameSpan = document.createElement('span');
+                nameSpan.className = 'cpe-name';
+                nameSpan.textContent = entry[0];
+                li.appendChild(nameSpan);
+
+                var countSpan = document.createElement('span');
+                countSpan.className = 'cpe-count';
+                countSpan.textContent = entry[1].toLocaleString();
+                li.appendChild(countSpan);
+
+                cpeList.appendChild(li);
+            });
+        }
+
+        // Most common CVSS vector
+        var vectorCounts = {};
+        data.forEach(function(row) {
+            if (row['CVSS_Vector'] && row['CVSS_Vector'].trim()) {
+                var v = row['CVSS_Vector'].trim();
+                vectorCounts[v] = (vectorCounts[v] || 0) + 1;
+            }
+        });
+        var sortedVectors = Object.entries(vectorCounts).sort(function(a, b) { return b[1] - a[1]; });
+        if (sortedVectors.length) {
+            document.getElementById('statVector').textContent = sortedVectors[0][0] + ' (' + sortedVectors[0][1].toLocaleString() + ' occurrences)';
+        } else {
+            document.getElementById('statVector').textContent = 'No data';
+        }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       Event Listeners & Init
+       ═══════════════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            filterData(e.target.value);
+        });
+
+        // Sortable headers
+        document.querySelectorAll('.data-table th[data-column]').forEach(function(th) {
+            th.addEventListener('click', function() { handleSort(th.dataset.column); });
+        });
+
+        // Load data
+        loadData();
+    });
+    </script>
 </body>
 </html>
