@@ -4,8 +4,9 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  schedule: 
-    - cron: "0 */6 * * *" 
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */6 * * *"
 
 jobs:
   update-list:
@@ -15,6 +16,13 @@ jobs:
       pull-requests: write
     steps:
     - uses: actions/checkout@v4
+    - name: Cache NVD data
+      uses: actions/cache@v4
+      with:
+        path: nvd.jsonl
+        key: nvd-data-${{ github.run_number }}
+        restore-keys: |
+          nvd-data-
     - uses: actions/setup-python@v5
       with:
         python-version: '3.13'
@@ -62,16 +70,68 @@ jobs:
         curl -sSf https://raw.githubusercontent.com/projectdiscovery/nuclei-templates/main/cves.json | \
           jq -r .ID > nuclei.txt || touch nuclei.txt
         
-        # Download CISA KEV data
-        wget https://www.cisa.gov/sites/default/files/csv/known_exploited_vulnerabilities.csv -O known_exploited_vulnerabilities.csv
-        
-        # Download NVD data
-        wget https://nvd.handsonhacking.org/nvd.jsonl -O nvd.jsonl || touch nvd.jsonl
+        # Download CISA KEV data with retry
+        for i in {1..3}; do
+          if wget https://www.cisa.gov/sites/default/files/csv/known_exploited_vulnerabilities.csv -O known_exploited_vulnerabilities.csv; then
+            break
+          elif [ $i -eq 3 ]; then
+            echo "Failed to download CISA data after 3 attempts"
+            exit 1
+          else
+            echo "Attempt $i failed, retrying..."
+            sleep 5
+          fi
+        done
+
+        # Download NVD data with retry
+        for i in {1..3}; do
+          if wget https://nvd.handsonhacking.org/nvd.jsonl -O nvd.jsonl; then
+            break
+          elif [ $i -eq 3 ]; then
+            echo "WARNING: Failed to download NVD data after 3 attempts"
+            if [ -f nvd.jsonl ] && [ -s nvd.jsonl ]; then
+              echo "Using cached NVD data"
+            else
+              echo "No cached NVD data available"
+              exit 1
+            fi
+          else
+            echo "Attempt $i failed, retrying..."
+            sleep 5
+          fi
+        done
          
+    - name: Lint Python code
+      run: |
+        pip install ruff
+        ruff check patchthisapp.py scripts/
+
+    - name: Smoke test (PR only)
+      if: github.event_name == 'pull_request'
+      run: |
+        touch metasploit.txt nuclei.txt known_exploited_vulnerabilities.csv epss_scores-current.csv nvd.jsonl
+        python patchthisapp.py --dry-run || true
+
     - name: Run PatchThisApp Python Script
       run: |
          python patchthisapp.py
-         
+
+    - name: Validate output
+      run: |
+        if [ ! -f data/data.csv ]; then
+          echo "ERROR: data/data.csv not generated"
+          exit 1
+        fi
+        ROW_COUNT=$(tail -n +2 data/data.csv | wc -l)
+        echo "Output contains $ROW_COUNT CVEs"
+        if [ "$ROW_COUNT" -lt 1 ]; then
+          echo "ERROR: Output CSV is empty"
+          exit 1
+        fi
+        echo "### Vulnerability Data Update" >> $GITHUB_STEP_SUMMARY
+        echo "- **CVEs processed:** $ROW_COUNT" >> $GITHUB_STEP_SUMMARY
+        echo "- **Run time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+
     - name: Commit changes
       uses: EndBug/add-and-commit@v9
       with:
