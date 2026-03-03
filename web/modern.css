@@ -288,7 +288,6 @@ main {
 .hero-section {
   text-align: center;
   padding: 4rem 2rem 3rem;
-  max-width: 900px;
   margin: 2rem auto 0;
 }
 
@@ -297,7 +296,6 @@ main {
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
-  max-width: 900px;
   width: 100%;
 }
 
@@ -515,6 +513,7 @@ html.dark .app-error {
   padding: 1.5rem;
   box-shadow: var(--shadow-sm);
   transition: all 0.2s ease;
+  text-align: center;
 }
 
 .stat-card:hover {
