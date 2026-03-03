@@ -59,14 +59,14 @@ def load_cisa(cisa_path: Path) -> pd.DataFrame:
     df['Source'] = 'CISA'
     return df[['CVE', 'Source']]
 
-def load_epss(epss_path: Path) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def load_epss(epss_path: Path, threshold: float = 0.95) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Load EPSS data and return filtered and full datasets."""
     df = load_csv(epss_path, skiprows=1)
     if df.empty:
         return df, df
     df = df.rename(columns={"cve": "CVE"})
     df_all = df.copy()
-    df = df[df.epss > .95].copy()
+    df = df[df.epss > threshold].copy()
     df['Source'] = 'EPSS'
     return df[['CVE', 'Source']], df_all
 
@@ -233,14 +233,23 @@ def main() -> None:
     parser.add_argument('--epss', type=Path, default=Path('epss_scores-current.csv'))
     parser.add_argument('--nvd', type=Path, default=Path('nvd.jsonl'))
     parser.add_argument('--output', type=Path, default=Path('data/data.csv'))
+    parser.add_argument('--epss-threshold', type=float, default=0.95,
+                        help='EPSS score threshold (default: 0.95)')
+    parser.add_argument('--verbose', action='store_true',
+                        help='Enable verbose/debug logging')
+    parser.add_argument('--dry-run', action='store_true',
+                        help='Report what would be produced without writing files')
     args = parser.parse_args()
+
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
 
     logging.info("Loading Metasploit and Nuclei data...")
     cve_sources = load_metasploit_nuclei(args.metasploit, args.nuclei)
     logging.info("Loading CISA data...")
     cisa_df = load_cisa(args.cisa)
     logging.info("Loading EPSS data...")
-    epss_df, epss_df_all = load_epss(args.epss)
+    epss_df, epss_df_all = load_epss(args.epss, args.epss_threshold)
     
     if cve_sources.empty and cisa_df.empty and epss_df.empty:
         logging.error("No CVE source data loaded. Exiting.")
@@ -274,6 +283,13 @@ def main() -> None:
             "vendor": "Vendor", "product": "Affected Products"
         })
     
+    logging.info(f"Final dataset: {len(patchthisapp_df)} CVEs")
+    if args.dry_run:
+        logging.info("Dry run mode — no files written")
+        logging.info(f"Columns: {list(patchthisapp_df.columns)}")
+        logging.info(f"Sample:\n{patchthisapp_df.head()}")
+        return
+
     args.output.parent.mkdir(parents=True, exist_ok=True)
     patchthisapp_df.to_csv(args.output, index=False)
     logging.info(f"Wrote output to {args.output}")
