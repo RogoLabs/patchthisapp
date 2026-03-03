@@ -6,7 +6,7 @@
 
 **Architecture:** Three parallel streams (Python, Actions, Web) developed Big Bang style on the `MarchUpdate` branch. The Python stream fixes data correctness (CPE parsing, CLI flags). The Actions stream adds resilience, quality gates, and Dependabot. The Web stream rewrites the 3 HTML files into a single SPA with light/dark mode, pagination, and accessibility. All must remain compatible with GitHub Pages static deployment.
 
-**Tech Stack:** Python 3.13, pandas, argparse, logging | GitHub Actions, ruff, Dependabot | Vanilla HTML/CSS/JS, Chart.js 4.4, PapaParse 5.4, dayjs 1.11
+**Tech Stack:** Python 3.13, pandas 3.x, argparse, logging | GitHub Actions, ruff, Dependabot | Vanilla HTML/CSS/JS, Chart.js 4.4, PapaParse 5.4, dayjs 1.11
 
 ---
 
@@ -177,7 +177,7 @@ git commit -m "feat: add --epss-threshold, --verbose, --dry-run CLI flags"
 Replace contents of `requirements.txt`:
 
 ```
-pandas>=2.0,<3.0
+pandas>=3.0,<4.0
 ```
 
 **Step 2: Fix column_summary.py**
