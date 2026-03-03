@@ -300,11 +300,6 @@ def main() -> None:
     patchthisapp_df.to_csv(web_csv_path, index=False)
     logging.info(f"Wrote web copy to {web_csv_path}")
     
-    # Also save a copy to the web/viewer folder for the CSV viewer
-    web_viewer_csv_path = Path('web/viewer/data.csv')
-    web_viewer_csv_path.parent.mkdir(parents=True, exist_ok=True)
-    patchthisapp_df.to_csv(web_viewer_csv_path, index=False)
-    logging.info(f"Wrote web viewer copy to {web_viewer_csv_path}")
 
 if __name__ == "__main__":
     main()
