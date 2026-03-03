@@ -6,7 +6,7 @@ import argparse
 import json
 import logging
 import pandas as pd
-from typing import List, Dict, Tuple, Any, Optional
+from typing import List, Dict, Tuple, Any
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -145,7 +145,7 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
     try:
         cve_data = entry.get('cve', {})
         if not isinstance(cve_data, dict):
-            logging.warning(f"Invalid CVE data structure in entry")
+            logging.warning("Invalid CVE data structure in entry")
             return fields
             
         fields['cve'] = cve_data.get('id', 'Unknown')
