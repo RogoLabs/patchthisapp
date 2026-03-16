@@ -11,7 +11,7 @@
 
 *Powered by [RogoLabs](https://rogolabs.net/) | Originally created by [Jerry Gamblin](https://www.jerrygamblin.com)*
 
-[Live Dashboard](https://patchthisapp.rogolabs.net) | [Quick Start](#quick-start) | [Documentation](#documentation) | [Contributing](#contributing)
+[Live Dashboard](https://patchthis.app) | [Quick Start](#quick-start) | [Documentation](#documentation) | [Contributing](#contributing)
 
 </div>
 
@@ -45,7 +45,7 @@ Our platform integrates data from the most trusted vulnerability intelligence so
 
 ### Prerequisites
 
-- Python 3.8+ (for data processing)
+- Python 3.10+ (for data processing)
 - Web server (for hosting static files)
 
 ### Installation
@@ -109,10 +109,18 @@ The `patchthisapp.py` script is the heart of our intelligence platform:
 - **Export Capabilities**: Generates CSV output
 - **Error Handling**: Robust error management and logging
 
-**New Columns:**
-- `Vendor`: The primary vendor associated with the vulnerability (from NVD CPE data)
-- `Affected Products`: The main affected product(s) (from NVD CPE data)
-- `CVSS_Vector`: The CVSS attack vector (e.g., NETWORK, ADJACENT, LOCAL)
+**Output Columns:**
+- `CVE`: CVE identifier
+- `CVSS Score`: Severity score (0.0–10.0)
+- `CVSS_Vector`: CVSS attack vector string (e.g., CVSS:3.1/AV:N/AC:L/...)
+- `EPSS`: Exploit Prediction Scoring System score (0.0–1.0)
+- `CWE`: Common Weakness Enumeration identifier (e.g., CWE-79, CWE-89)
+- `Description`: Vulnerability description from NVD
+- `Published`: Publication date (YYYY-MM-DD)
+- `Source`: Intelligence source attribution (Metasploit/Nuclei/CISA/EPSS)
+- `CPE`: Common Platform Enumeration URIs (semicolon-separated)
+- `Vendor`: Primary vendor (from NVD CPE data)
+- `Affected Products`: Main affected product(s) (from NVD CPE data)
 
 **Usage:**
 ```bash
@@ -152,15 +160,19 @@ Additional features:
 
 The generated `data.csv` includes the following columns:
 
-- `CVE`: CVE identifier
-- `CVSS Score`: Severity score (0.0-10.0)
-- `CVSS_Vector`: CVSS attack vector (e.g., NETWORK, ADJACENT, LOCAL)
-- `EPSS`: Exploit prediction score (0.0-1.0)
-- `Description`: Vulnerability description
-- `Published`: Publication date
-- `Source`: Data source attribution
-- `Vendor`: Primary vendor (from NVD CPE)
-- `Affected Products`: Main affected product(s) (from NVD CPE)
+| Column | Description | Example |
+|--------|-------------|---------|
+| `CVE` | CVE identifier | CVE-2024-0001 |
+| `CVSS Score` | Severity score (0.0–10.0) | 9.8 |
+| `CVSS_Vector` | CVSS v3.1 vector string | CVSS:3.1/AV:N/AC:L/... |
+| `EPSS` | Exploit prediction score (0.0–1.0) | 0.97 |
+| `CWE` | Weakness classification | CWE-79 |
+| `Description` | Vulnerability description from NVD | ... |
+| `Published` | Publication date | 2024-01-15 |
+| `Source` | Intelligence source attribution | Metasploit/CISA |
+| `CPE` | Platform enumeration URIs | cpe:2.3:a:vendor:... |
+| `Vendor` | Primary vendor (from CPE) | Apache |
+| `Affected Products` | Main affected product (from CPE) | Http Server |
 
 ### Helper Scripts
 
