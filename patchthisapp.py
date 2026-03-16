@@ -269,17 +269,17 @@ def main() -> None:
     patchthisapp_df = pd.merge(cve_list, nvd, how='inner', left_on='CVE', right_on='CVE')
     if not epss_df_all.empty:
         patchthisapp_df = pd.merge(patchthisapp_df, epss_df_all, how='inner', left_on='CVE', right_on='CVE')
-        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'epss', 'Description', 'Published', 'Source', 'cpe', 'vendor', 'product']
+        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'epss', 'cwe', 'Description', 'Published', 'Source', 'cpe', 'vendor', 'product']
         patchthisapp_df = patchthisapp_df[columns]
         patchthisapp_df = patchthisapp_df.rename(columns={
-            "epss": "EPSS", "cvss_vector": "CVSS_Vector", "cpe": "CPE",
+            "epss": "EPSS", "cvss_vector": "CVSS_Vector", "cwe": "CWE", "cpe": "CPE",
             "vendor": "Vendor", "product": "Affected Products"
         })
     else:
-        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'Description', 'Published', 'Source', 'cpe', 'vendor', 'product']
+        columns = ['CVE', 'CVSS Score', 'cvss_vector', 'cwe', 'Description', 'Published', 'Source', 'cpe', 'vendor', 'product']
         patchthisapp_df = patchthisapp_df[columns]
         patchthisapp_df = patchthisapp_df.rename(columns={
-            "cvss_vector": "CVSS_Vector", "cpe": "CPE",
+            "cvss_vector": "CVSS_Vector", "cwe": "CWE", "cpe": "CPE",
             "vendor": "Vendor", "product": "Affected Products"
         })
     
