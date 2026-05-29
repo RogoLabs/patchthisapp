@@ -7,7 +7,12 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from patchthisapp import extract_entry_data, main, process_nvd_files
+from patchthisapp import (
+    choose_primary_vendor_product,
+    extract_entry_data,
+    main,
+    normalize_vendor_brand,
+)
 
 # The canonical column lists for CSV output. If these change, the test
 # must be updated intentionally — that's the point.
@@ -99,6 +104,31 @@ class TestExtractEntryData:
         result = extract_entry_data(entry)
         assert result["vendor"] == "Apache"
         assert result["product"] == "Http Server"
+
+    def test_vendor_brand_casing_normalized(self):
+        entry = _make_nvd_entry(cpe="cpe:2.3:o:dlink:dir-300_firmware:*:*:*:*:*:*:*:*")
+        result = extract_entry_data(entry)
+        assert result["vendor"] == "D-Link"
+        assert result["product"] == "Dir-300 Firmware"
+
+    def test_vendor_brand_can_be_overridden_by_map(self):
+        override_map = {"Acmecorp": "ACME Corp"}
+        assert normalize_vendor_brand("Acmecorp", override_map) == "ACME Corp"
+
+    def test_cpe_vendor_product_prefers_firmware_os_entries(self):
+        cpes = [
+            "cpe:2.3:h:axis:a1001:-:*:*:*:*:*:*:*",
+            "cpe:2.3:o:axis:a1001_firmware:*:*:*:*:*:*:*:*",
+        ]
+        vendor, product = choose_primary_vendor_product(cpes)
+        assert vendor == "Axis"
+        assert product == "A1001 Firmware"
+
+    def test_invalid_cpe_does_not_produce_garbage_fields(self):
+        cpes = ["124-e_firmware:*:*:*:*:*:*:*:axis", ""]
+        vendor, product = choose_primary_vendor_product(cpes)
+        assert vendor == ""
+        assert product == ""
 
 
 class TestCSVOutputFormat:
@@ -202,3 +232,43 @@ class TestCSVOutputFormat:
         df = pd.read_csv(workspace["output"])
         cwe_values = set(df["CWE"].values)
         assert "CWE-79" in cwe_values or "CWE-89" in cwe_values
+
+    def test_vendor_product_fallback_to_cisa_when_cpe_missing(self, workspace, monkeypatch):
+        """When NVD has no CPE fields, Vendor/Product should fallback from CISA."""
+        entries = [
+            _make_nvd_entry(
+                cve_id="CVE-2024-9999",
+                cpe="",
+                description="No CPE test",
+            )
+        ]
+        workspace["nvd"].write_text(json.dumps(entries))
+        workspace["metasploit"].write_text("CVE-2024-9999\n")
+        workspace["nuclei"].write_text("")
+        workspace["cisa"].write_text(
+            "cveID,vendorProject,product,cwes\n"
+            "CVE-2024-9999,Axis,A1001 Firmware,CWE-79\n"
+        )
+        workspace["epss"].write_text(
+            "#model_version:v2024.01.01,score_date:2024-01-15\n"
+            "cve,epss,percentile\n"
+            "CVE-2024-9999,0.97,0.99\n"
+        )
+
+        monkeypatch.chdir(workspace["tmp_path"])
+        args = [
+            "patchthisapp",
+            "--metasploit", str(workspace["metasploit"]),
+            "--nuclei", str(workspace["nuclei"]),
+            "--cisa", str(workspace["cisa"]),
+            "--epss", str(workspace["epss"]),
+            "--nvd", str(workspace["nvd"]),
+            "--output", str(workspace["output"]),
+        ]
+        monkeypatch.setattr("sys.argv", args)
+        main()
+
+        df = pd.read_csv(workspace["output"])
+        row = df[df["CVE"] == "CVE-2024-9999"].iloc[0]
+        assert row["Vendor"] == "Axis"
+        assert row["Affected Products"] == "A1001 Firmware"

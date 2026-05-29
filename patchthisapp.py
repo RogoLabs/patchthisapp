@@ -11,6 +11,41 @@ from typing import List, Dict, Tuple, Any
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+DEFAULT_VENDOR_BRAND_MAP = {
+    'Dlink': 'D-Link',
+    'Tp-Link': 'TP-Link',
+    'Linksys': 'Linksys',
+}
+
+
+def load_vendor_brand_map(path: Path) -> Dict[str, str]:
+    """Load vendor brand casing map from JSON; fallback to built-in defaults."""
+    if not path.exists():
+        return dict(DEFAULT_VENDOR_BRAND_MAP)
+
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            loaded = json.load(f)
+        if not isinstance(loaded, dict):
+            logging.warning(f"Vendor brand map at {path} is not a JSON object. Using defaults.")
+            return dict(DEFAULT_VENDOR_BRAND_MAP)
+
+        # Only accept string keys/values to avoid malformed map entries.
+        normalized = {
+            str(k): str(v)
+            for k, v in loaded.items()
+            if isinstance(k, str) and isinstance(v, str)
+        }
+        merged = dict(DEFAULT_VENDOR_BRAND_MAP)
+        merged.update(normalized)
+        return merged
+    except Exception as e:
+        logging.warning(f"Failed to load vendor brand map from {path}: {e}. Using defaults.")
+        return dict(DEFAULT_VENDOR_BRAND_MAP)
+
+
+VENDOR_BRAND_MAP = load_vendor_brand_map(Path(__file__).with_name('vendor_brand_map.json'))
+
 def load_csv(path: Path, **kwargs) -> pd.DataFrame:
     """Load CSV file with error handling."""
     if not path.exists():
@@ -57,7 +92,16 @@ def load_cisa(cisa_path: Path) -> pd.DataFrame:
         return df
     df = df.rename(columns={"cveID": "CVE"})
     df['Source'] = 'CISA'
-    return df[['CVE', 'Source']]
+
+    # Keep vendor/product context from KEV for fallback when NVD CPE parsing
+    # does not produce Vendor/Affected Products.
+    if 'vendorProject' not in df.columns:
+        df['vendorProject'] = ''
+    if 'product' not in df.columns:
+        df['product'] = ''
+
+    df = df.rename(columns={"vendorProject": "cisa_vendor", "product": "cisa_product"})
+    return df[['CVE', 'Source', 'cisa_vendor', 'cisa_product']]
 
 def load_epss(epss_path: Path, threshold: float = 0.95) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Load EPSS data and return filtered and full datasets."""
@@ -85,18 +129,85 @@ def load_nvd_data(filename: Path) -> List[Dict[str, Any]]:
         logging.error(f"Unexpected error reading NVD file {filename}: {e}")
         return []
 
+def normalize_cpe_token(token: str) -> str:
+    """Normalize one CPE token into a readable label."""
+    if not token or token in {'*', '-'}:
+        return ''
+    cleaned = token.replace('\\', '').replace('_', ' ').strip()
+    if not cleaned:
+        return ''
+    # Collapse repeated whitespace and normalize casing for readability.
+    cleaned = ' '.join(cleaned.split())
+    return cleaned.title()
+
+
+def normalize_vendor_brand(vendor: str, brand_map: Dict[str, str] = None) -> str:
+    """Normalize known vendor brand casing for display consistency."""
+    if not vendor:
+        return ''
+
+    effective_map = brand_map if brand_map is not None else VENDOR_BRAND_MAP
+    return effective_map.get(vendor, vendor)
+
+
 def parse_cpe_fields(cpe_string: str) -> Tuple[str, str]:
-    """Extract vendor and product from a CPE 2.3 string.
-    CPE format: cpe:2.3:part:vendor:product:version:...
-    """
-    if not cpe_string:
+    """Extract normalized vendor and product from a CPE 2.3 string."""
+    if not cpe_string or not cpe_string.startswith('cpe:2.3:'):
         return ('', '')
+
     parts = cpe_string.split(':')
-    if len(parts) >= 5:
-        vendor = parts[3].replace('_', ' ').title()
-        product = parts[4].replace('_', ' ').title()
-        return (vendor, product)
-    return ('', '')
+    if len(parts) < 5:
+        return ('', '')
+
+    vendor = normalize_vendor_brand(normalize_cpe_token(parts[3]))
+    product = normalize_cpe_token(parts[4])
+    return (vendor, product)
+
+
+def choose_primary_vendor_product(cpe_list: List[str]) -> Tuple[str, str]:
+    """Choose the best vendor/product candidate from a list of CPE values."""
+    best_vendor = ''
+    best_product = ''
+    best_score = -1
+
+    for cpe_string in cpe_list:
+        vendor, product = parse_cpe_fields(cpe_string)
+        if not vendor and not product:
+            continue
+
+        parts = cpe_string.split(':')
+        cpe_part = parts[2] if len(parts) > 2 else ''
+
+        score = 0
+        if vendor:
+            score += 2
+        if product:
+            score += 2
+        if cpe_part == 'o':
+            score += 3
+        elif cpe_part == 'h':
+            score += 2
+        elif cpe_part == 'a':
+            score += 1
+        if 'firmware' in product.lower():
+            score += 1
+
+        if score > best_score:
+            best_score = score
+            best_vendor = vendor
+            best_product = product
+
+    return (best_vendor, best_product)
+
+
+def first_non_empty(series: pd.Series) -> str:
+    """Return the first non-empty, non-null value from a Series."""
+    for value in series:
+        if pd.notna(value):
+            text = str(value).strip()
+            if text:
+                return text
+    return ''
 
 def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
     """Extract relevant CVE data from NVD entry with improved error handling."""
@@ -136,7 +247,7 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
                         cpe_list.append(cpe_uri)
         if cpe_list:
             fields['cpe'] = ';'.join(sorted(set(cpe_list)))
-            vendor, product = parse_cpe_fields(cpe_list[0])
+            vendor, product = choose_primary_vendor_product(cpe_list)
             fields['vendor'] = vendor
             fields['product'] = product
     except Exception as e:
@@ -256,7 +367,17 @@ def main() -> None:
         return
     
     cve_list = pd.concat([cve_sources, epss_df, cisa_df], ignore_index=True, sort=False)
-    cve_list = cve_list.groupby('CVE', as_index=False).agg({'CVE': 'first', 'Source': '/'.join})
+    if 'cisa_vendor' not in cve_list.columns:
+        cve_list['cisa_vendor'] = ''
+    if 'cisa_product' not in cve_list.columns:
+        cve_list['cisa_product'] = ''
+
+    cve_list = cve_list.groupby('CVE', as_index=False).agg({
+        'CVE': 'first',
+        'Source': lambda s: '/'.join(sorted(set(filter(None, (str(v).strip() for v in s))))),
+        'cisa_vendor': first_non_empty,
+        'cisa_product': first_non_empty,
+    })
 
     logging.info("Processing NVD data...")
     nvd = process_nvd_files(args.nvd)
@@ -267,6 +388,15 @@ def main() -> None:
 
     logging.info("Merging data and writing output...")
     patchthisapp_df = pd.merge(cve_list, nvd, how='inner', left_on='CVE', right_on='CVE')
+
+    # Fill empty vendor/product from CISA when NVD CPE parsing yields blanks.
+    patchthisapp_df['vendor'] = patchthisapp_df['vendor'].fillna('')
+    patchthisapp_df['product'] = patchthisapp_df['product'].fillna('')
+    patchthisapp_df['cisa_vendor'] = patchthisapp_df['cisa_vendor'].fillna('')
+    patchthisapp_df['cisa_product'] = patchthisapp_df['cisa_product'].fillna('')
+    patchthisapp_df.loc[patchthisapp_df['vendor'].str.strip() == '', 'vendor'] = patchthisapp_df['cisa_vendor']
+    patchthisapp_df.loc[patchthisapp_df['product'].str.strip() == '', 'product'] = patchthisapp_df['cisa_product']
+
     if not epss_df_all.empty:
         patchthisapp_df = pd.merge(patchthisapp_df, epss_df_all, how='inner', left_on='CVE', right_on='CVE')
         columns = ['CVE', 'CVSS Score', 'cvss_vector', 'epss', 'cwe', 'Description', 'Published', 'Source', 'cpe', 'vendor', 'product']
