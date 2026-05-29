@@ -379,6 +379,22 @@
             text-align: center;
             font-family: 'SF Mono', Monaco, 'Menlo', monospace;
         }
+        .product-cell {
+            min-width: 220px;
+        }
+        .product-name {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.35;
+        }
+        .product-vendor {
+            display: block;
+            margin-top: 0.2rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
         .date-cell {
             font-family: 'SF Mono', Monaco, 'Menlo', monospace;
             font-size: 0.8rem;
@@ -830,8 +846,8 @@
                                     EPSS
                                     <span class="sort-icon" aria-hidden="true">&#9662;</span>
                                 </th>
-                                <th scope="col" data-column="Published" aria-sort="descending">
-                                    Published
+                                <th scope="col" data-column="Affected Products" aria-sort="none">
+                                    Vendor / Product
                                     <span class="sort-icon" aria-hidden="true">&#9662;</span>
                                 </th>
                                 <th scope="col" data-column="Source" aria-sort="none">
@@ -985,10 +1001,17 @@
     var allData = [];
     var filteredData = [];
     var charts = {};
-    var currentSort = { column: 'Published', direction: 'desc' };
+    var currentSort = { column: 'EPSS', direction: 'desc' };
 
     var ROWS_PER_PAGE = 50;
     var currentPage = 1;
+
+    function getSortValue(row, column) {
+        if (column === 'Vendor / Product' || column === 'Affected Products') {
+            return ((row['Affected Products'] || '') + ' ' + (row['Vendor'] || '')).trim();
+        }
+        return row[column] || '';
+    }
 
     /* ═══════════════════════════════════════════════════════
        Data Loading (single fetch, shared)
@@ -1325,8 +1348,8 @@
         currentSort = { column: column, direction: direction };
 
         filteredData.sort(function(a, b) {
-            var aVal = a[column] || '';
-            var bVal = b[column] || '';
+            var aVal = getSortValue(a, column);
+            var bVal = getSortValue(b, column);
 
             if (column === 'CVSS Score' || column === 'EPSS') {
                 aVal = parseFloat(aVal) || 0;
@@ -1425,12 +1448,21 @@
             epssTd.textContent = epss > 0 ? epss.toFixed(3) : 'N/A';
             tr.appendChild(epssTd);
 
-            // Published
-            var dateTd = document.createElement('td');
-            dateTd.className = 'date-cell';
-            var date = new Date(row.Published);
-            dateTd.textContent = isNaN(date.getTime()) ? 'N/A' : date.toLocaleDateString();
-            tr.appendChild(dateTd);
+            // Vendor / Product
+            var productTd = document.createElement('td');
+            productTd.className = 'product-cell';
+
+            var productName = document.createElement('span');
+            productName.className = 'product-name';
+            productName.textContent = row['Affected Products'] || 'Unknown Product';
+            productTd.appendChild(productName);
+
+            var productVendor = document.createElement('span');
+            productVendor.className = 'product-vendor';
+            productVendor.textContent = row['Vendor'] ? 'Vendor: ' + row['Vendor'] : 'Vendor unavailable';
+            productTd.appendChild(productVendor);
+
+            tr.appendChild(productTd);
 
             // Source
             var sourceTd = document.createElement('td');
