@@ -19,7 +19,7 @@ jobs:
       with:
         ref: ${{ github.event_name == 'pull_request' && github.head_ref || 'main' }}
     - name: Cache NVD data
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: nvd.jsonl
         key: nvd-data-${{ github.run_number }}
@@ -32,7 +32,7 @@ jobs:
         
     # Cache pip dependencies
     - name: Cache pip dependencies
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
