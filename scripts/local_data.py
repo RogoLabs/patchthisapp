@@ -1,17 +1,18 @@
 import os
-import subprocess
-import shutil
 import platform
+import shutil
+import subprocess
+import sys
 import time
 
 
 def run_command(cmd):
     """Run a shell command and exit on failure."""
     print(f"Running: {cmd}")
-    result = subprocess.run(cmd, shell=True)
+    result = subprocess.run(cmd, shell=True, check=False)
     if result.returncode != 0:
         print(f"Command failed: {cmd}")
-        exit(result.returncode)
+        sys.exit(result.returncode)
 
 
 def ensure_tool(tool, install_cmds):
@@ -24,10 +25,10 @@ def ensure_tool(tool, install_cmds):
                 if shutil.which(tool):
                     print(f"{tool} installed successfully.")
                     return
-            except Exception:
-                pass
+            except (OSError, subprocess.SubprocessError) as e:
+                print(f"Install command failed: {cmd}: {e}")
         print(f"Failed to install {tool}. Please install it manually.")
-        exit(1)
+        sys.exit(1)
 
 
 def main():
@@ -37,7 +38,7 @@ def main():
     if system == "Darwin":  # macOS
         if shutil.which("brew") is None:
             print("Homebrew not found. Please install Homebrew from https://brew.sh/ and re-run this script.")
-            exit(1)
+            sys.exit(1)
         ensure_tool("jq", ["brew install jq"])
         ensure_tool("wget", ["brew install wget"])
         ensure_tool("curl", ["brew install curl"])
@@ -49,7 +50,7 @@ def main():
         ensure_tool("gzip", ["sudo apt-get update && sudo apt-get install gzip -y"])
     else:
         print(f"Unsupported OS: {system}")
-        exit(1)
+        sys.exit(1)
 
     # Download EPSS data with retry
     for i in range(1, 4):
@@ -57,7 +58,7 @@ def main():
             break
         elif i == 3:
             print('Failed to download EPSS data after 3 attempts')
-            exit(1)
+            sys.exit(1)
         else:
             print(f'Attempt {i} failed, retrying...')
             time.sleep(5)
