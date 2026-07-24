@@ -1,15 +1,17 @@
 # patchthisapp.py
 # Modernized: pathlib, type hints, argparse, modularization, logging, __main__ guard, file checks
 
-from pathlib import Path
 import argparse
 import json
 import logging
+from pathlib import Path
+from typing import Any
+
 import pandas as pd
-from typing import List, Dict, Tuple, Any
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 DEFAULT_VENDOR_BRAND_MAP = {
     'Dlink': 'D-Link',
@@ -18,7 +20,7 @@ DEFAULT_VENDOR_BRAND_MAP = {
 }
 
 
-def load_vendor_brand_map(path: Path) -> Dict[str, str]:
+def load_vendor_brand_map(path: Path) -> dict[str, str]:
     """Load vendor brand casing map from JSON; fallback to built-in defaults."""
     if not path.exists():
         return dict(DEFAULT_VENDOR_BRAND_MAP)
@@ -27,7 +29,7 @@ def load_vendor_brand_map(path: Path) -> Dict[str, str]:
         with open(path, 'r', encoding='utf-8') as f:
             loaded = json.load(f)
         if not isinstance(loaded, dict):
-            logging.warning(f"Vendor brand map at {path} is not a JSON object. Using defaults.")
+            logger.warning(f"Vendor brand map at {path} is not a JSON object. Using defaults.")
             return dict(DEFAULT_VENDOR_BRAND_MAP)
 
         # Only accept string keys/values to avoid malformed map entries.
@@ -39,8 +41,8 @@ def load_vendor_brand_map(path: Path) -> Dict[str, str]:
         merged = dict(DEFAULT_VENDOR_BRAND_MAP)
         merged.update(normalized)
         return merged
-    except Exception as e:
-        logging.warning(f"Failed to load vendor brand map from {path}: {e}. Using defaults.")
+    except Exception as e:  # noqa: BLE001
+        logger.warning(f"Failed to load vendor brand map from {path}: {e}. Using defaults.")
         return dict(DEFAULT_VENDOR_BRAND_MAP)
 
 
@@ -49,16 +51,16 @@ VENDOR_BRAND_MAP = load_vendor_brand_map(Path(__file__).with_name('vendor_brand_
 def load_csv(path: Path, **kwargs) -> pd.DataFrame:
     """Load CSV file with error handling."""
     if not path.exists():
-        logging.error(f"Missing file: {path}")
+        logger.error(f"Missing file: {path}")
         return pd.DataFrame()
     
     try:
         return pd.read_csv(path, **kwargs)
     except (pd.errors.EmptyDataError, pd.errors.ParserError) as e:
-        logging.error(f"Error reading CSV file {path}: {e}")
+        logger.error(f"Error reading CSV file {path}: {e}")
         return pd.DataFrame()
-    except Exception as e:
-        logging.error(f"Unexpected error reading {path}: {e}")
+    except Exception as e:  # noqa: BLE001
+        logger.error(f"Unexpected error reading {path}: {e}")
         return pd.DataFrame()
 
 def load_metasploit_nuclei(metasploit_path: Path, nuclei_path: Path) -> pd.DataFrame:
@@ -68,7 +70,7 @@ def load_metasploit_nuclei(metasploit_path: Path, nuclei_path: Path) -> pd.DataF
     nuclei_df = load_csv(nuclei_path, header=None, names=columns)
     
     if metasploit_df.empty and nuclei_df.empty:
-        logging.warning("No Metasploit or Nuclei data loaded.")
+        logger.warning("No Metasploit or Nuclei data loaded.")
         return pd.DataFrame()
     
     # Process each dataframe only if it's not empty
@@ -103,7 +105,7 @@ def load_cisa(cisa_path: Path) -> pd.DataFrame:
     df = df.rename(columns={"vendorProject": "cisa_vendor", "product": "cisa_product"})
     return df[['CVE', 'Source', 'cisa_vendor', 'cisa_product']]
 
-def load_epss(epss_path: Path, threshold: float = 0.95) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def load_epss(epss_path: Path, threshold: float = 0.95) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load EPSS data and return filtered and full datasets."""
     df = load_csv(epss_path, skiprows=1)
     if df.empty:
@@ -114,19 +116,19 @@ def load_epss(epss_path: Path, threshold: float = 0.95) -> Tuple[pd.DataFrame, p
     df['Source'] = 'EPSS'
     return df[['CVE', 'Source']], df_all
 
-def load_nvd_data(filename: Path) -> List[Dict[str, Any]]:
+def load_nvd_data(filename: Path) -> list[dict[str, Any]]:
     """Load NVD data from JSON file."""
     if not filename.exists():
-        logging.error(f"Missing NVD file: {filename}")
+        logger.error(f"Missing NVD file: {filename}")
         return []
     try:
         with open(filename, 'r', encoding='utf-8') as f:
             return json.load(f)
     except json.JSONDecodeError as e:
-        logging.error(f"Error decoding JSON from file {filename}: {e}")
+        logger.error(f"Error decoding JSON from file {filename}: {e}")
         return []
-    except Exception as e:
-        logging.error(f"Unexpected error reading NVD file {filename}: {e}")
+    except Exception as e:  # noqa: BLE001
+        logger.error(f"Unexpected error reading NVD file {filename}: {e}")
         return []
 
 def normalize_cpe_token(token: str) -> str:
@@ -141,7 +143,7 @@ def normalize_cpe_token(token: str) -> str:
     return cleaned.title()
 
 
-def normalize_vendor_brand(vendor: str, brand_map: Dict[str, str] = None) -> str:
+def normalize_vendor_brand(vendor: str, brand_map: dict[str, str] | None = None) -> str:
     """Normalize known vendor brand casing for display consistency."""
     if not vendor:
         return ''
@@ -150,7 +152,7 @@ def normalize_vendor_brand(vendor: str, brand_map: Dict[str, str] = None) -> str
     return effective_map.get(vendor, vendor)
 
 
-def parse_cpe_fields(cpe_string: str) -> Tuple[str, str]:
+def parse_cpe_fields(cpe_string: str) -> tuple[str, str]:
     """Extract normalized vendor and product from a CPE 2.3 string."""
     if not cpe_string or not cpe_string.startswith('cpe:2.3:'):
         return ('', '')
@@ -164,7 +166,7 @@ def parse_cpe_fields(cpe_string: str) -> Tuple[str, str]:
     return (vendor, product)
 
 
-def choose_primary_vendor_product(cpe_list: List[str]) -> Tuple[str, str]:
+def choose_primary_vendor_product(cpe_list: list[str]) -> tuple[str, str]:
     """Choose the best vendor/product candidate from a list of CPE values."""
     best_vendor = ''
     best_product = ''
@@ -209,7 +211,7 @@ def first_non_empty(series: pd.Series) -> str:
                 return text
     return ''
 
-def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
+def extract_entry_data(entry: dict[str, Any]) -> dict[str, str]:
     """Extract relevant CVE data from NVD entry with improved error handling."""
     fields = {
         'assigner': 'Missing_Data',
@@ -250,13 +252,13 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
             vendor, product = choose_primary_vendor_product(cpe_list)
             fields['vendor'] = vendor
             fields['product'] = product
-    except Exception as e:
-        logging.warning(f"Error extracting CPEs: {e}")
+    except Exception as e:  # noqa: BLE001
+        logger.warning(f"Error extracting CPEs: {e}")
     
     try:
         cve_data = entry.get('cve', {})
         if not isinstance(cve_data, dict):
-            logging.warning("Invalid CVE data structure in entry")
+            logger.warning("Invalid CVE data structure in entry")
             return fields
             
         fields['cve'] = cve_data.get('id', 'Unknown')
@@ -297,7 +299,7 @@ def extract_entry_data(entry: Dict[str, Any]) -> Dict[str, str]:
             fields['description'] = descriptions[0].get('value', fields['description'])
             
     except (KeyError, IndexError, TypeError) as e:
-        logging.warning(f"Error extracting data from entry: {e}")
+        logger.warning(f"Error extracting data from entry: {e}")
     
     return fields
 
@@ -305,12 +307,12 @@ def process_nvd_files(nvd_path: Path) -> pd.DataFrame:
     """Process NVD files and return a DataFrame with CVE data."""
     row_accumulator = []
     if not nvd_path.exists():
-        logging.error(f"NVD file not found: {nvd_path}")
+        logger.error(f"NVD file not found: {nvd_path}")
         return pd.DataFrame()
     
     nvd_data = load_nvd_data(nvd_path)
     if not nvd_data:
-        logging.warning("No NVD data loaded from file")
+        logger.warning("No NVD data loaded from file")
         return pd.DataFrame()
     
     for entry in nvd_data:
@@ -318,12 +320,12 @@ def process_nvd_files(nvd_path: Path) -> pd.DataFrame:
             entry_data = extract_entry_data(entry)
             if not entry_data['description'].startswith('** REJECT **'):
                 row_accumulator.append(entry_data)
-        except Exception as e:
-            logging.warning(f"Error processing NVD entry: {e}")
+        except Exception as e:  # noqa: BLE001
+            logger.warning(f"Error processing NVD entry: {e}")
             continue
     
     if not row_accumulator:
-        logging.warning("No valid NVD entries found")
+        logger.warning("No valid NVD entries found")
         return pd.DataFrame()
     
     nvd = pd.DataFrame(row_accumulator)
@@ -355,15 +357,15 @@ def main() -> None:
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
-    logging.info("Loading Metasploit and Nuclei data...")
+    logger.info("Loading Metasploit and Nuclei data...")
     cve_sources = load_metasploit_nuclei(args.metasploit, args.nuclei)
-    logging.info("Loading CISA data...")
+    logger.info("Loading CISA data...")
     cisa_df = load_cisa(args.cisa)
-    logging.info("Loading EPSS data...")
+    logger.info("Loading EPSS data...")
     epss_df, epss_df_all = load_epss(args.epss, args.epss_threshold)
     
     if cve_sources.empty and cisa_df.empty and epss_df.empty:
-        logging.error("No CVE source data loaded. Exiting.")
+        logger.error("No CVE source data loaded. Exiting.")
         return
     
     cve_list = pd.concat([cve_sources, epss_df, cisa_df], ignore_index=True, sort=False)
@@ -379,14 +381,14 @@ def main() -> None:
         'cisa_product': first_non_empty,
     })
 
-    logging.info("Processing NVD data...")
+    logger.info("Processing NVD data...")
     nvd = process_nvd_files(args.nvd)
     if nvd.empty:
-        logging.error("No NVD data loaded. Exiting.")
+        logger.error("No NVD data loaded. Exiting.")
         return
     nvd = nvd.rename(columns={'cve': 'CVE', 'description': 'Description', 'base_score': 'CVSS Score'})
 
-    logging.info("Merging data and writing output...")
+    logger.info("Merging data and writing output...")
     patchthisapp_df = pd.merge(cve_list, nvd, how='inner', left_on='CVE', right_on='CVE')
 
     # Fill empty vendor/product from CISA when NVD CPE parsing yields blanks.
@@ -413,22 +415,22 @@ def main() -> None:
             "vendor": "Vendor", "product": "Affected Products"
         })
     
-    logging.info(f"Final dataset: {len(patchthisapp_df)} CVEs")
+    logger.info(f"Final dataset: {len(patchthisapp_df)} CVEs")
     if args.dry_run:
-        logging.info("Dry run mode — no files written")
-        logging.info(f"Columns: {list(patchthisapp_df.columns)}")
-        logging.info(f"Sample:\n{patchthisapp_df.head()}")
+        logger.info("Dry run mode — no files written")
+        logger.info(f"Columns: {list(patchthisapp_df.columns)}")
+        logger.info(f"Sample:\n{patchthisapp_df.head()}")
         return
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     patchthisapp_df.to_csv(args.output, index=False)
-    logging.info(f"Wrote output to {args.output}")
+    logger.info(f"Wrote output to {args.output}")
     
     # Also save a copy to the web folder for the CSV viewer
     web_csv_path = Path('web/data.csv')
     web_csv_path.parent.mkdir(parents=True, exist_ok=True)
     patchthisapp_df.to_csv(web_csv_path, index=False)
-    logging.info(f"Wrote web copy to {web_csv_path}")
+    logger.info(f"Wrote web copy to {web_csv_path}")
     
 
 if __name__ == "__main__":
