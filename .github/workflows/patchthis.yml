@@ -25,7 +25,7 @@ jobs:
         key: nvd-data-${{ github.run_number }}
         restore-keys: |
           nvd-data-
-    - uses: actions/setup-python@v6
+    - uses: actions/setup-python@v7
       with:
         python-version: '3.13'
         architecture: 'x64'
