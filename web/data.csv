@@ -8330,6 +8330,30 @@ If these machine keys are compromised, attackers could create and send a malicio
 
 
 The risk does not originate from a vulnerability introduced by ScreenConnect, but from platform level behavior.  This had no direct impact to ScreenConnect Client. ScreenConnect 2025.4 patch disables ViewState and removes any dependency on it.",2025-04-25,CISA,cpe:2.3:a:connectwise:screenconnect:*:*:*:*:*:*:*:*,Connectwise,Screenconnect
+CVE-2025-39682,9.8,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H,0.00505,NVD-CWE-Other,"In the Linux kernel, the following vulnerability has been resolved:
+
+tls: fix handling of zero-length records on the rx_list
+
+Each recvmsg() call must process either
+ - only contiguous DATA records (any number of them)
+ - one non-DATA record
+
+If the next record has different type than what has already been
+processed we break out of the main processing loop. If the record
+has already been decrypted (which may be the case for TLS 1.3 where
+we don't know type until decryption) we queue the pending record
+to the rx_list. Next recvmsg() will pick it up from there.
+
+Queuing the skb to rx_list after zero-copy decrypt is not possible,
+since in that case we decrypted directly to the user space buffer,
+and we don't have an skb to queue (darg.skb points to the ciphertext
+skb for access to metadata like length).
+
+Only data records are allowed zero-copy, and we break the processing
+loop after each non-data record. So we should never zero-copy and
+then find out that the record type has changed. The corner case
+we missed is when the initial record comes from rx_list, and it's
+zero length.",2025-09-05,CISA,cpe:2.3:o:debian:debian_linux:11.0:*:*:*:*:*:*:*;cpe:2.3:o:linux:linux_kernel:*:*:*:*:*:*:*:*;cpe:2.3:o:linux:linux_kernel:6.17:rc1:*:*:*:*:*:*;cpe:2.3:o:linux:linux_kernel:6.17:rc2:*:*:*:*:*:*,Linux,Linux Kernel
 CVE-2025-39964,7.8,CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H,0.00323,NVD-CWE-noinfo,"In the Linux kernel, the following vulnerability has been resolved:
 
 crypto: af_alg - Disallow concurrent writes in af_alg_sendmsg
@@ -9632,7 +9656,7 @@ CVE-2026-8713,9.1,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:H,0.02669,CWE-22,"T
 CVE-2026-8732,9.8,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H,0.22728,CWE-306,"The WP Maps Pro plugin for WordPress is vulnerable to Privilege Escalation via Administrator Account Creation in all versions up to, and including, 6.1.0. This is due to the wpgmp_temp_access_ajax AJAX action being registered with wp_ajax_nopriv_ and protected only by a nonce check using the fc-call-nonce nonce, which is publicly embedded into every frontend page via wp_localize_script as the nonce field of the wpgmp_local JavaScript object, rendering the check ineffective as an access control mechanism. This makes it possible for unauthenticated attackers to invoke the wpgmp_temp_access_support handler with check_temp=false, which unconditionally creates a new WordPress user with the hardcoded role of administrator via wp_insert_user() and returns a magic login URL that, when visited, calls wp_set_auth_cookie() to fully authenticate the attacker as the newly created administrator, resulting in complete site takeover.",2026-05-29,Nuclei,,,
 CVE-2026-87491,8.8,CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H,0.00997,CWE-787,Out of bounds write in V8 in Google Chrome prior to 153.0.8010.36 allowed a remote attacker to execute arbitrary code inside the sandbox via a crafted HTML page. (Chromium security severity: Medium),2026-09-09,CISA,cpe:2.3:a:google:chrome:*:*:*:*:*:*:*:*,Google,Chrome
 CVE-2026-87820,5.3,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N,0.00522,CWE-200,"CyberPanel versions 2.4.3 through 2.4.5 expose unauthenticated AI Scanner debugging endpoints that disclose administrator usernames, API-key prefixes, scan identifiers, target domains, and account metadata. Unauthenticated attackers can enumerate panel administrators and recent scanner activity to inventory multi-tenant installations and facilitate follow-on attacks.",2026-09-09,Nuclei,,,
-CVE-2026-87886,0.0,,0.00281,CWE-276,"Local privilege escalation due to insecure file permissions. The following products are affected: Acronis Backup plugin for cPanel & WHM (Linux) before build 1.9.3.1021, Acronis Backup extension for Plesk (Linux) before build 1.8.11.638, Acronis Backup plugin for DirectAdmin (Linux) before build 1.2.3.238.",2026-09-17,CISA,,Acronis,Backup
+CVE-2026-87886,0.0,,0.00281,CWE-276,"Local privilege escalation due to insecure file permissions. The following products are affected: Acronis Backup plugin for cPanel & WHM (Linux) before build 1.9.3.1021, Acronis Backup extension for Plesk (Linux) before build 1.8.11.638, Acronis Backup plugin for DirectAdmin (Linux) before build 1.2.3.238.",2026-09-17,CISA,cpe:2.3:a:acronis:acronis_backup:*:*:*:*:*:cpanel:*:*;cpe:2.3:a:acronis:acronis_backup:*:*:*:*:*:directadmin:*:*;cpe:2.3:a:acronis:acronis_backup:*:*:*:*:*:plesk:*:*;cpe:2.3:a:acronis:acronis_backup:1.9.3:-:*:*:*:cpanel:*:*;cpe:2.3:a:acronis:acronis_backup:1.9.3:hotfix1:*:*:*:cpanel:*:*;cpe:2.3:a:acronis:acronis_backup:1.9.3:hotfix2:*:*:*:cpanel:*:*;cpe:2.3:o:linux:linux_kernel:-:*:*:*:*:*:*:*,Linux,Linux Kernel
 CVE-2026-88062,0.0,,0.00943,CWE-94,"OmniRoute is an open-source AI gateway providing a single endpoint for multiple model providers. In 3.8.49 and earlier, the OmniRoute POST /api/acp/agents custom ACP agent endpoint accepted attacker-controlled binary and versionCommand values and used only a self-consistency check before execFileSync executed the selected interpreter and arguments. The same request called refreshAgentCache, and resolveVersionProbe accepted the matched command before the execFileSync sink ran it. The tokenizeVersionCommand function and DISALLOWED_VERSION_COMMAND_CHARS filter rejected a limited set of shell metacharacters but still allowed interpreter evaluation arguments. The isAuthenticated function relied on isAuthRequired, which accepted anonymous requests when requireLogin was false, while api/acp/ was absent from LOCAL_ONLY_API_PREFIXES and SPAWN_CAPABLE_PREFIXES. With requireLogin=false or during a fresh-instance bootstrap window, a remote anonymous request could supply an interpreter evaluation argument and execute arbitrary code in the server container. With requireLogin=true and a configured management password, exploitation instead required a management session or management-scoped API key. No fixed version is available as of this review.",2026-09-10,Nuclei,,,
 CVE-2026-8839,5.3,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N,0.01018,CWE-639,"The MapPress Maps for WordPress plugin for WordPress is vulnerable to Authorization Bypass Through User-Controlled Key in all versions up to, and including, 2.96.6. This is due to missing ownership verification in the REST API routes registered via `Mappress_Api::rest_api_init()`, where the GET `/wp-json/mapp/v1/maps/{mapid}` endpoint uses `'permission_callback' => '__return_true'` and the write endpoints (POST update, DELETE, PATCH mutate, POST clone, POST empty_trash) only check the generic `edit_posts` capability without confirming that the requester owns the targeted map — a gap that is not compensated at the model layer, as `Mappress_Map::get()`, `save()`, `delete()`, `mutate()`, and `empty_trash()` all operate on any caller-supplied map ID without an ownership check. This makes it possible for unauthenticated attackers to read sensitive map data — including POI titles, addresses, coordinates, and body content — for any map on the site by enumerating map IDs, and for authenticated attackers with Contributor-level access and above to modify, delete, trash/restore, or clone any map regardless of its author.",2026-06-06,Nuclei,,,
 CVE-2026-8857,8.8,CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H,0.02098,CWE-94,"A vulnerability in Wikimedia Foundation timeline.
