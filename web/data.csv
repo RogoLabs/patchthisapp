@@ -8353,7 +8353,7 @@ Only data records are allowed zero-copy, and we break the processing
 loop after each non-data record. So we should never zero-copy and
 then find out that the record type has changed. The corner case
 we missed is when the initial record comes from rx_list, and it's
-zero length.",2025-09-05,CISA,cpe:2.3:o:debian:debian_linux:11.0:*:*:*:*:*:*:*;cpe:2.3:o:linux:linux_kernel:*:*:*:*:*:*:*:*;cpe:2.3:o:linux:linux_kernel:6.17:rc1:*:*:*:*:*:*;cpe:2.3:o:linux:linux_kernel:6.17:rc2:*:*:*:*:*:*,Linux,Linux Kernel
+zero length.",2025-09-05,CISA,cpe:2.3:h:siemens:simatic_cn_4100:-:*:*:*:*:*:*:*;cpe:2.3:o:debian:debian_linux:11.0:*:*:*:*:*:*:*;cpe:2.3:o:linux:linux_kernel:*:*:*:*:*:*:*:*;cpe:2.3:o:linux:linux_kernel:6.17:rc1:*:*:*:*:*:*;cpe:2.3:o:linux:linux_kernel:6.17:rc2:*:*:*:*:*:*;cpe:2.3:o:siemens:simatic_cn_4100_firmware:*:*:*:*:*:*:*:*,Siemens,Simatic Cn 4100 Firmware
 CVE-2025-39964,7.8,CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H,0.0079,CWE-362,"In the Linux kernel, the following vulnerability has been resolved:
 
 crypto: af_alg - Disallow concurrent writes in af_alg_sendmsg
