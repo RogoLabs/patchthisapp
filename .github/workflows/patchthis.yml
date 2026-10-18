@@ -203,7 +203,7 @@ jobs:
           PY
 
     - name: Stage generated data artifacts
-      run: git add -- data/data.csv web/data.csv web/cve-guidance.json
+      run: git add -f -- data/data.csv web/data.csv web/cve-guidance.json
 
     - name: Commit changes
       uses: EndBug/add-and-commit@v11
