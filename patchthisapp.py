@@ -4,6 +4,7 @@
 import argparse
 import json
 import logging
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -102,8 +103,24 @@ def load_cisa(cisa_path: Path) -> pd.DataFrame:
     if 'product' not in df.columns:
         df['product'] = ''
 
-    df = df.rename(columns={"vendorProject": "cisa_vendor", "product": "cisa_product"})
-    return df[['CVE', 'Source', 'cisa_vendor', 'cisa_product']]
+    optional_columns = {
+        'requiredAction': 'kev_required_action',
+        'dueDate': 'kev_due_date',
+        'dateAdded': 'kev_date_added',
+    }
+    for source_column in optional_columns:
+        if source_column not in df.columns:
+            df[source_column] = ''
+
+    df = df.rename(columns={
+        "vendorProject": "cisa_vendor",
+        "product": "cisa_product",
+        **optional_columns,
+    })
+    return df[[
+        'CVE', 'Source', 'cisa_vendor', 'cisa_product',
+        'kev_required_action', 'kev_due_date', 'kev_date_added',
+    ]]
 
 def load_epss(epss_path: Path, threshold: float = 0.95) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Load EPSS data and return filtered and full datasets."""
@@ -211,9 +228,9 @@ def first_non_empty(series: pd.Series) -> str:
                 return text
     return ''
 
-def extract_entry_data(entry: dict[str, Any]) -> dict[str, str]:
+def extract_entry_data(entry: dict[str, Any]) -> dict[str, Any]:
     """Extract relevant CVE data from NVD entry with improved error handling."""
-    fields = {
+    fields: dict[str, Any] = {
         'assigner': 'Missing_Data',
         'published_date': 'Missing_Data',
         'attack_vector': 'Missing_Data',
@@ -233,7 +250,8 @@ def extract_entry_data(entry: dict[str, Any]) -> dict[str, str]:
         'cpe': '',
         'cvss_vector': '',
         'vendor': '',
-        'product': ''
+        'product': '',
+        'nvd_references': [],
     }
     # Extract CPEs (if present)
     try:
@@ -264,6 +282,15 @@ def extract_entry_data(entry: dict[str, Any]) -> dict[str, str]:
         fields['cve'] = cve_data.get('id', 'Unknown')
         fields['assigner'] = cve_data.get('sourceIdentifier', fields['assigner'])
         fields['published_date'] = cve_data.get('published', fields['published_date'])
+        fields['nvd_references'] = [
+            {
+                'url': reference.get('url', ''),
+                'source': reference.get('source', ''),
+                'tags': reference.get('tags', []),
+            }
+            for reference in cve_data.get('references', [])
+            if isinstance(reference, dict) and reference.get('url')
+        ]
         
         # Extract CVSS metrics with better error handling
         metrics_data = cve_data.get('metrics', {})
@@ -373,12 +400,18 @@ def main() -> None:
         cve_list['cisa_vendor'] = ''
     if 'cisa_product' not in cve_list.columns:
         cve_list['cisa_product'] = ''
+    for column in ('kev_required_action', 'kev_due_date', 'kev_date_added'):
+        if column not in cve_list.columns:
+            cve_list[column] = ''
 
     cve_list = cve_list.groupby('CVE', as_index=False).agg({
         'CVE': 'first',
         'Source': lambda s: '/'.join(sorted(set(filter(None, (str(v).strip() for v in s))))),
         'cisa_vendor': first_non_empty,
         'cisa_product': first_non_empty,
+        'kev_required_action': first_non_empty,
+        'kev_due_date': first_non_empty,
+        'kev_date_added': first_non_empty,
     })
 
     logger.info("Processing NVD data...")
@@ -390,6 +423,27 @@ def main() -> None:
 
     logger.info("Merging data and writing output...")
     patchthisapp_df = pd.merge(cve_list, nvd, how='inner', left_on='CVE', right_on='CVE')
+
+    generated_at = datetime.now(timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')
+    guidance_by_cve = {}
+    for _, row in patchthisapp_df.iterrows():
+        references = row.get('nvd_references', [])
+        if not isinstance(references, list):
+            references = []
+        kev = {}
+        for source_column, guidance_key in (
+            ('kev_required_action', 'required_action'),
+            ('kev_due_date', 'due_date'),
+            ('kev_date_added', 'date_added'),
+        ):
+            value = row.get(source_column, '')
+            if pd.notna(value) and str(value).strip():
+                kev[guidance_key] = str(value).strip()
+        if kev or references:
+            guidance_by_cve[row['CVE']] = {
+                'kev': kev or None,
+                'nvd_references': references,
+            }
 
     # Fill empty vendor/product from CISA when NVD CPE parsing yields blanks.
     patchthisapp_df['vendor'] = patchthisapp_df['vendor'].fillna('')
@@ -431,6 +485,13 @@ def main() -> None:
     web_csv_path.parent.mkdir(parents=True, exist_ok=True)
     patchthisapp_df.to_csv(web_csv_path, index=False)
     logger.info(f"Wrote web copy to {web_csv_path}")
+
+    guidance_path = web_csv_path.parent / 'cve-guidance.json'
+    guidance_path.write_text(json.dumps({
+        'generated_at_utc': generated_at,
+        'cves': guidance_by_cve,
+    }, indent=2) + '\n', encoding='utf-8')
+    logger.info(f"Wrote remediation guidance to {guidance_path}")
     
 
 if __name__ == "__main__":

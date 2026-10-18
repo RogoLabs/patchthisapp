@@ -1,3 +1,6 @@
+                        <nav id="paginationControls" class="pagination" aria-label="Vulnerability pages" tabindex="-1"></nav>
+            <p class="section-subtitle">Source membership provides prioritization context; NVD enriches CVE records with product and severity data.</p>
+                        <p>Known exploited vulnerabilities. Catalog action text and dates are shown where available.</p>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -305,6 +308,10 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
         }
+        .search-box:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
 
         .table-wrapper {
             background: var(--surface);
@@ -328,7 +335,7 @@
             font-weight: 600;
             color: var(--text-primary);
             border-bottom: 2px solid var(--border-light);
-            cursor: pointer;
+            cursor: default;
             user-select: none;
             transition: background-color 0.2s ease;
             white-space: nowrap;
@@ -661,12 +668,12 @@
         @media (max-width: 768px) {
             .hero-title { font-size: 2rem; }
             .hero-subtitle { font-size: 1.25rem; }
-            .charts-grid { grid-template-columns: 1fr; }
+            .charts-grid { grid-template-columns: minmax(0, 1fr); }
             .stat-value { font-size: 2rem; }
             .spa-section { padding: 2rem 1rem; }
             .overview-grid { grid-template-columns: 1fr; }
-            .nav-container { padding: 0 1rem; gap: 0; }
-            .nav-link { padding: 0.5rem 0.6rem; font-size: 0.8rem; }
+            .nav-container { padding: 0 1rem; gap: 0.25rem; flex-wrap: nowrap; overflow-x: auto; }
+            .nav-link { flex: 0 0 auto; padding: 0.5rem 0.6rem; font-size: 0.8rem; white-space: nowrap; }
             .search-box { min-width: 100%; }
             .explorer-header { flex-direction: column; align-items: stretch; }
         }
@@ -678,6 +685,7 @@
 </head>
 <body>
 
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <!-- ════════════════════ STICKY NAV ════════════════════ -->
     <nav class="main-nav">
         <div class="nav-container">
@@ -691,7 +699,7 @@
         </div>
     </nav>
 
-    <main>
+    <main id="main-content">
 
         <!-- ════════════════════ HERO ════════════════════ -->
         <section id="hero" class="hero-section card">
@@ -709,7 +717,7 @@
 
             <div class="trust-indicators">
                 <div class="trust-item">
-                    <div class="trust-label">Refreshed</div>
+                    <div class="trust-label">Update schedule</div>
                     <div class="trust-value">Every 6 Hours</div>
                 </div>
                 <div class="trust-item">
@@ -724,13 +732,13 @@
         </section>
 
         <!-- ════════════════════ LOADING STATE ════════════════════ -->
-        <div id="appLoading" class="app-loading">
+        <div id="appLoading" class="app-loading" role="status" aria-live="polite">
             <div class="loading-spinner"></div>
             <p>Loading vulnerability data...</p>
         </div>
 
         <!-- ════════════════════ ERROR STATE ════════════════════ -->
-        <div id="appError" class="app-error" style="display:none;">
+        <div id="appError" class="app-error" role="alert" aria-live="assertive" style="display:none;">
             <p>Failed to load vulnerability data. Please try again.</p>
             <button onclick="loadData()">Retry</button>
         </div>
@@ -738,7 +746,8 @@
         <!-- ════════════════════ DASHBOARD ════════════════════ -->
         <section id="dashboard" class="spa-section data-section">
             <h2 class="section-title">Vulnerability Analytics Dashboard</h2>
-            <p class="section-subtitle">Real-time vulnerability intelligence and trend analysis</p>
+            <p class="section-subtitle">A static snapshot of vulnerability signals; prioritization is not proof of exposure.</p>
+            <p id="dataFreshness" class="data-freshness" role="status" aria-live="polite">Data generation time unavailable.</p>
 
             <!-- Stats Cards -->
             <div class="stats-grid">
@@ -770,8 +779,9 @@
                 <div class="chart-card full-width">
                     <h3 class="chart-title">Vulnerability Timeline (Last 6 Months)</h3>
                     <div class="chart-container tall">
-                        <canvas id="timelineChart"></canvas>
+                        <canvas id="timelineChart" aria-hidden="true"></canvas>
                     </div>
+                    <p id="timelineChartSummary" class="chart-data-summary"></p>
                 </div>
 
                 <!-- Intelligence Feed Overlap -->
@@ -779,40 +789,45 @@
                     <h3 class="chart-title">Intelligence Feed Overlap</h3>
                     <p class="chart-description">Shows CVEs appearing in single vs. multiple intelligence feeds</p>
                     <div class="chart-container">
-                        <canvas id="sourceChart"></canvas>
+                        <canvas id="sourceChart" aria-hidden="true"></canvas>
                     </div>
+                    <p id="sourceChartSummary" class="chart-data-summary"></p>
                 </div>
 
                 <!-- CVSS Distribution -->
                 <div class="chart-card full-width">
                     <h3 class="chart-title">CVSS Score Distribution</h3>
                     <div class="chart-container">
-                        <canvas id="cvssChart"></canvas>
+                        <canvas id="cvssChart" aria-hidden="true"></canvas>
                     </div>
+                    <p id="cvssChartSummary" class="chart-data-summary"></p>
                 </div>
 
                 <!-- Attack Vector -->
                 <div class="chart-card full-width">
                     <h3 class="chart-title">Attack Vector Distribution</h3>
                     <div class="chart-container">
-                        <canvas id="vectorChart"></canvas>
+                        <canvas id="vectorChart" aria-hidden="true"></canvas>
                     </div>
+                    <p id="vectorChartSummary" class="chart-data-summary"></p>
                 </div>
 
                 <!-- EPSS Risk Levels -->
                 <div class="chart-card full-width">
                     <h3 class="chart-title">EPSS Risk Levels</h3>
                     <div class="chart-container">
-                        <canvas id="epssChart"></canvas>
+                        <canvas id="epssChart" aria-hidden="true"></canvas>
                     </div>
+                    <p id="epssChartSummary" class="chart-data-summary"></p>
                 </div>
 
                 <!-- Top 10 Products -->
                 <div class="chart-card full-width">
                     <h3 class="chart-title">Top 10 Most Affected Products</h3>
                     <div class="chart-container">
-                        <canvas id="productsChart"></canvas>
+                        <canvas id="productsChart" aria-hidden="true"></canvas>
                     </div>
+                    <p id="productsChartSummary" class="chart-data-summary"></p>
                 </div>
             </div>
         </section>
@@ -820,46 +835,87 @@
         <!-- ════════════════════ EXPLORER ════════════════════ -->
         <section id="explorer" class="spa-section data-section">
             <h2 class="section-title">Data Explorer</h2>
-            <p class="section-subtitle">Search, sort, and analyze the full vulnerability dataset</p>
+            <p class="section-subtitle">Find vulnerabilities, review their evidence, and follow authoritative references.</p>
+            <p id="explorerFreshness" class="data-freshness">Data generation time unavailable.</p>
 
             <div class="explorer-header">
-                <input type="text" id="searchInput" class="search-box" placeholder="Search CVEs, products, sources..." aria-label="Search vulnerabilities">
-                <a href="data.csv" download="patchthisapp-data.csv" class="btn-primary" style="padding:0.65rem 1.5rem; font-size:0.9rem;">
-                    Download CSV
-                </a>
+                <div class="explorer-filters" role="search" aria-label="Filter vulnerabilities">
+                    <label class="filter-field search-field">
+                        <span>Search all fields</span>
+                        <input type="search" id="searchInput" class="search-box" placeholder="CVE, product, description...">
+                    </label>
+                    <label class="filter-field">
+                        <span>Severity</span>
+                        <select id="severityFilter">
+                            <option value="">All severities</option>
+                            <option value="Critical">Critical</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                            <option value="Unknown">Unknown</option>
+                        </select>
+                    </label>
+                    <label class="filter-field">
+                        <span>Source</span>
+                        <select id="sourceFilter">
+                            <option value="">All sources</option>
+                            <option value="CISA">CISA KEV</option>
+                            <option value="EPSS">EPSS</option>
+                            <option value="Metasploit">Metasploit</option>
+                            <option value="Nuclei">Nuclei</option>
+                        </select>
+                    </label>
+                    <label class="filter-field vendor-field">
+                        <span>Vendor or product</span>
+                        <input type="search" id="vendorFilter" class="search-box" placeholder="Type a vendor or product">
+                    </label>
+                    <label class="filter-field page-size-field">
+                        <span>Rows per page</span>
+                        <select id="pageSizeSelect">
+                            <option value="25">25</option>
+                            <option value="50" selected>50</option>
+                            <option value="100">100</option>
+                            <option value="200">200</option>
+                        </select>
+                    </label>
+                    <button id="resetFilters" class="btn-secondary filter-reset" type="button">Reset filters</button>
+                </div>
+                <div class="explorer-downloads">
+                    <button id="downloadFiltered" class="btn-primary" type="button" disabled>Download filtered CSV</button>
+                    <a href="data.csv" download="patchthisapp-data.csv" class="btn-secondary">Download full CSV</a>
+                </div>
             </div>
+            <p id="resultStatus" class="result-status" role="status" aria-live="polite" aria-atomic="true">Loading results...</p>
+            <p class="methodology-note">CVSS describes technical severity. EPSS estimates the probability of exploitation in the next 30 days. CISA KEV actions and dates are catalog guidance; verify product and version applicability with the vendor. A listed source or score does not confirm exposure in your environment.</p>
 
             <div class="table-wrapper">
-                <div class="table-scroll">
-                    <table class="data-table" role="grid" aria-label="Vulnerability data">
+                <p class="table-scroll-hint">On smaller screens, scroll horizontally to see all columns.</p>
+                <div class="table-scroll" tabindex="0" aria-label="Scrollable vulnerability table">
+                    <table class="data-table" aria-label="Vulnerability data">
                         <thead>
                             <tr>
                                 <th scope="col" data-column="CVE" aria-sort="none">
-                                    CVE
-                                    <span class="sort-icon" aria-hidden="true">&#9662;</span>
+                                    <button class="sort-button" type="button">CVE <span class="sort-icon" aria-hidden="true">&#9662;</span></button>
                                 </th>
                                 <th scope="col" data-column="CVSS Score" aria-sort="none">
-                                    CVSS Score
-                                    <span class="sort-icon" aria-hidden="true">&#9662;</span>
+                                    <button class="sort-button" type="button">CVSS Score <span class="sort-icon" aria-hidden="true">&#9662;</span></button>
                                 </th>
                                 <th scope="col" data-column="EPSS" aria-sort="none">
-                                    EPSS
-                                    <span class="sort-icon" aria-hidden="true">&#9662;</span>
+                                    <button class="sort-button" type="button">EPSS <span class="sort-icon" aria-hidden="true">&#9662;</span></button>
                                 </th>
                                 <th scope="col" data-column="Affected Products" aria-sort="none">
-                                    Vendor / Product
-                                    <span class="sort-icon" aria-hidden="true">&#9662;</span>
+                                    <button class="sort-button" type="button">Affected products / NVD scope <span class="sort-icon" aria-hidden="true">&#9662;</span></button>
                                 </th>
                                 <th scope="col" data-column="Source" aria-sort="none">
-                                    Source
-                                    <span class="sort-icon" aria-hidden="true">&#9662;</span>
+                                    <button class="sort-button" type="button">Source <span class="sort-icon" aria-hidden="true">&#9662;</span></button>
                                 </th>
+                                <th scope="col">Details</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody"></tbody>
                     </table>
                 </div>
-                <div id="paginationControls" class="pagination"></div>
+                <nav id="paginationControls" class="pagination" aria-label="Vulnerability pages"></nav>
             </div>
 
             <!-- Overview Statistics Panel -->
@@ -960,13 +1016,14 @@
        ═══════════════════════════════════════════════════════ */
     function toggleDarkMode() {
         document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme',
-            document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-        );
+        var isDark = document.documentElement.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        document.querySelector('.dark-toggle').setAttribute('aria-pressed', String(isDark));
     }
     if (localStorage.getItem('theme') === 'dark') {
         document.documentElement.classList.add('dark');
     }
+    document.querySelector('.dark-toggle').setAttribute('aria-pressed', String(document.documentElement.classList.contains('dark')));
 
     /* ═══════════════════════════════════════════════════════
        Chart.js Defaults & Color Palette
@@ -1000,6 +1057,8 @@
        ═══════════════════════════════════════════════════════ */
     var allData = [];
     var filteredData = [];
+    var guidanceData = { cves: {} };
+    var openDetailRefreshers = [];
     var charts = {};
     var currentSort = { column: 'EPSS', direction: 'desc' };
 
@@ -1011,6 +1070,17 @@
             return ((row['Affected Products'] || '') + ' ' + (row['Vendor'] || '')).trim();
         }
         return row[column] || '';
+    }
+
+    function getCPEConfigurationSummary(row) {
+        var criteria = (row.CPE || '').split(';').map(function(value) { return value.trim(); }).filter(Boolean);
+        var vendors = new Set();
+        criteria.forEach(function(cpe) {
+            var parts = cpe.split(':');
+            var vendor = parts.length > 3 ? parts[3].trim().toLowerCase() : '';
+            if (vendor && vendor !== '*' && vendor !== '-') vendors.add(vendor);
+        });
+        return { count: criteria.length, vendorCount: vendors.size };
     }
 
     /* ═══════════════════════════════════════════════════════
@@ -1032,6 +1102,11 @@
             allData = parsed.data;
             filteredData = allData.slice();
 
+            guidanceData = { cves: {} };
+            guidanceData = { cves: {} };
+            updateDataFreshness();
+            loadGuidance();
+
             document.getElementById('appLoading').style.display = 'none';
             document.querySelectorAll('.data-section').forEach(function(s) { s.classList.add('loaded'); });
 
@@ -1041,6 +1116,7 @@
             sortData(currentSort.column, currentSort.direction);
             updateSortIndicators();
             updateOverviewStats(allData);
+            document.getElementById('downloadFiltered').disabled = false;
         } catch (error) {
             console.error('Error:', error);
             document.getElementById('appLoading').style.display = 'none';
@@ -1086,6 +1162,9 @@
         var sortedMonths = Object.keys(monthCounts).sort();
         var labels = sortedMonths.map(function(m) { return dayjs(m).format('MMM YYYY'); });
         var data = sortedMonths.map(function(m) { return monthCounts[m]; });
+        updateChartSummary('timelineChartSummary', sortedMonths.map(function(month, index) {
+            return [dayjs(month).format('MMM YYYY'), data[index]];
+        }));
 
         var ctx = document.getElementById('timelineChart').getContext('2d');
         charts.timeline = new Chart(ctx, {
@@ -1142,6 +1221,7 @@
             return entry[0] + ' (' + percentage + '%)';
         });
         var data = sortedEntries.map(function(entry) { return entry[1]; });
+        updateChartSummary('sourceChartSummary', sortedEntries);
 
         var ctx = document.getElementById('sourceChart').getContext('2d');
         charts.source = new Chart(ctx, {
@@ -1184,6 +1264,7 @@
     /* ── CVSS Distribution Chart ── */
     function createCVSSChart() {
         var cvssRanges = {
+            'No score / 0.0': 0,
             'Low (0-3.9)': 0,
             'Medium (4-6.9)': 0,
             'High (7-8.9)': 0,
@@ -1192,11 +1273,13 @@
 
         allData.forEach(function(row) {
             var score = parseFloat(row['CVSS Score']) || 0;
-            if (score < 4) cvssRanges['Low (0-3.9)']++;
+            if (score <= 0) cvssRanges['No score / 0.0']++;
+            else if (score < 4) cvssRanges['Low (0-3.9)']++;
             else if (score < 7) cvssRanges['Medium (4-6.9)']++;
             else if (score < 9) cvssRanges['High (7-8.9)']++;
             else cvssRanges['Critical (9-10)']++;
         });
+        updateChartSummary('cvssChartSummary', Object.entries(cvssRanges));
 
         var ctx = document.getElementById('cvssChart').getContext('2d');
         charts.cvss = new Chart(ctx, {
@@ -1206,7 +1289,7 @@
                 datasets: [{
                     label: 'Count',
                     data: Object.values(cvssRanges),
-                    backgroundColor: [colors.tertiary, colors.secondary, colors.primary, colors.primaryDark],
+                    backgroundColor: [colors.slate1, colors.tertiary, colors.secondary, colors.primary, colors.primaryDark],
                     borderWidth: 0
                 }]
             },
@@ -1233,6 +1316,7 @@
         var sortedVectors = Object.entries(vectorCounts)
             .sort(function(a, b) { return b[1] - a[1]; })
             .slice(0, 5);
+        updateChartSummary('vectorChartSummary', sortedVectors);
 
         var ctx = document.getElementById('vectorChart').getContext('2d');
         charts.vector = new Chart(ctx, {
@@ -1260,6 +1344,7 @@
     /* ── EPSS Risk Levels Chart ── */
     function createEPSSChart() {
         var epssRanges = {
+            'Unknown': 0,
             'Low (0-0.5)': 0,
             'Medium (0.5-0.8)': 0,
             'High (0.8-0.90)': 0,
@@ -1267,12 +1352,14 @@
         };
 
         allData.forEach(function(row) {
-            var epss = parseFloat(row['EPSS']) || 0;
-            if (epss < 0.5) epssRanges['Low (0-0.5)']++;
+            var epss = parseFloat(row['EPSS']);
+            if (!Number.isFinite(epss)) epssRanges['Unknown']++;
+            else if (epss < 0.5) epssRanges['Low (0-0.5)']++;
             else if (epss < 0.8) epssRanges['Medium (0.5-0.8)']++;
             else if (epss <= 0.90) epssRanges['High (0.8-0.90)']++;
             else epssRanges['Critical (>0.90)']++;
         });
+        updateChartSummary('epssChartSummary', Object.entries(epssRanges));
 
         var ctx = document.getElementById('epssChart').getContext('2d');
         charts.epss = new Chart(ctx, {
@@ -1282,7 +1369,7 @@
                 datasets: [{
                     label: 'Count',
                     data: Object.values(epssRanges),
-                    backgroundColor: [colors.tertiary, colors.secondary, colors.primary, colors.primaryDark],
+                    backgroundColor: [colors.slate1, colors.tertiary, colors.secondary, colors.primary, colors.primaryDark],
                     borderWidth: 0
                 }]
             },
@@ -1313,6 +1400,7 @@
         var top10 = Object.entries(cpeCounts)
             .sort(function(a, b) { return b[1] - a[1]; })
             .slice(0, 10);
+        updateChartSummary('productsChartSummary', top10);
 
         var ctx = document.getElementById('productsChart').getContext('2d');
         charts.products = new Chart(ctx, {
@@ -1343,239 +1431,433 @@
        EXPLORER — Table, Search, Sort, Pagination
        ═══════════════════════════════════════════════════════ */
 
+    function updateChartSummary(elementId, entries) {
+        var summary = document.getElementById(elementId);
+        summary.textContent = entries.length
+            ? 'Chart data: ' + entries.map(function(entry) {
+                return entry[0] + ': ' + Number(entry[1]).toLocaleString();
+            }).join('; ') + '.'
+            : 'No chart data is available.';
+    }
+
     /* ── Sort ── */
+    function updateDataFreshness() {
+        var generatedAt = guidanceData.generated_at_utc;
+        var timestamp = generatedAt ? new Date(generatedAt) : null;
+        var message = timestamp && !isNaN(timestamp.getTime())
+            ? 'Dataset generated ' + new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }).format(timestamp) + ' UTC.'
+            : 'Data generation time unavailable.';
+        document.getElementById('dataFreshness').textContent = message;
+        document.getElementById('explorerFreshness').textContent = message;
+    }
+
+    function loadGuidance() {
+        fetch('./cve-guidance.json')
+            .then(function(response) { return response.ok ? response.json() : null; })
+            .then(function(parsedGuidance) {
+                if (!parsedGuidance || !parsedGuidance.cves || typeof parsedGuidance.cves !== 'object') return;
+                guidanceData = parsedGuidance;
+                updateDataFreshness();
+                openDetailRefreshers.forEach(function(refresh) { refresh(); });
+            })
+            .catch(function(error) { console.warn('Remediation guidance is unavailable:', error); });
+    }
+
+    function appendDetailField(container, label, value) {
+        var wrapper = document.createElement('div');
+        var term = document.createElement('dt');
+        var description = document.createElement('dd');
+        term.textContent = label;
+        description.textContent = value || 'Not available in this dataset.';
+        wrapper.appendChild(term);
+        wrapper.appendChild(description);
+        container.appendChild(wrapper);
+    }
+
+    function appendExternalLink(container, url, label) {
+        try {
+            var parsedUrl = new URL(url);
+            if (parsedUrl.protocol !== 'https:' && parsedUrl.protocol !== 'http:') return false;
+            var link = document.createElement('a');
+            link.href = parsedUrl.href;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = label;
+            link.setAttribute('aria-label', label + ' (opens in a new tab)');
+            container.appendChild(link);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function createRowDetails(row, detailId) {
+        var detailsRow = document.createElement('tr');
+        detailsRow.className = 'detail-row';
+        detailsRow.hidden = true;
+        detailsRow.id = detailId;
+        var detailsCell = document.createElement('td');
+        detailsCell.colSpan = 6;
+        var panel = document.createElement('section');
+        panel.className = 'row-detail-panel';
+        var heading = document.createElement('h3');
+        heading.textContent = 'CVE details';
+        panel.appendChild(heading);
+
+        var fields = document.createElement('dl');
+        fields.className = 'row-detail-grid';
+        appendDetailField(fields, 'Description', row.Description);
+        appendDetailField(fields, 'CWE', row.CWE);
+        appendDetailField(fields, 'Published', row.Published);
+        appendDetailField(fields, 'CVSS vector', row.CVSS_Vector);
+        panel.appendChild(fields);
+
+        var cpeCriteria = (row.CPE || '').split(';').filter(function(value) { return value.trim(); });
+        var cpeScope = getCPEConfigurationSummary(row);
+        if (cpeScope.count) {
+            var cpeNote = document.createElement('p');
+            cpeNote.className = 'guidance-note';
+            cpeNote.textContent = 'NVD lists ' + cpeScope.count.toLocaleString() + ' CPE criteria across ' + cpeScope.vendorCount.toLocaleString() + ' vendors. The table shows one example match, not the complete affected scope or confirmation of exposure. Review full product and version ranges in the NVD record below.';
+            panel.appendChild(cpeNote);
+        }
+
+        var guidanceHeading = document.createElement('h4');
+        guidanceHeading.textContent = 'Patch guidance';
+        panel.appendChild(guidanceHeading);
+        var guidance = guidanceData.cves && guidanceData.cves[row.CVE] ? guidanceData.cves[row.CVE] : {};
+        var kev = guidance.kev;
+        var isKev = (row.Source || '').split('/').includes('CISA');
+        if (isKev) {
+            var hasKevMetadata = kev && (kev.required_action || kev.due_date || kev.date_added);
+            if (hasKevMetadata) {
+                var kevFields = document.createElement('dl');
+                kevFields.className = 'row-detail-grid';
+                if (kev.required_action) appendDetailField(kevFields, 'CISA KEV required action', kev.required_action);
+                if (kev.due_date) appendDetailField(kevFields, 'CISA KEV due date', kev.due_date);
+                if (kev.date_added) appendDetailField(kevFields, 'CISA KEV date added', kev.date_added);
+                panel.appendChild(kevFields);
+            } else {
+                var missingKev = document.createElement('p');
+                missingKev.className = 'guidance-note';
+                missingKev.textContent = 'This CVE is marked as known exploited, but its CISA action and dates are not bundled in this snapshot.';
+                panel.appendChild(missingKev);
+                var cisaLink = document.createElement('p');
+                appendExternalLink(cisaLink, 'https://www.cisa.gov/known-exploited-vulnerabilities-catalog?field_cve=' + encodeURIComponent(row.CVE || ''), 'Find this CVE in the CISA KEV catalog');
+                panel.appendChild(cisaLink);
+            }
+            var kevNote = document.createElement('p');
+            kevNote.className = 'guidance-note';
+            kevNote.textContent = 'When present, action text and dates are reproduced from CISA. The catalog due date is not an organization-specific deadline.';
+            panel.appendChild(kevNote);
+        } else {
+            var noKev = document.createElement('p');
+            noKev.className = 'guidance-note';
+            noKev.textContent = 'This CVE is not marked as a CISA KEV entry in this dataset.';
+            panel.appendChild(noKev);
+        }
+
+        var referencesHeading = document.createElement('h4');
+        var references = Array.isArray(guidance.nvd_references) ? guidance.nvd_references.filter(function(reference) {
+            return reference && reference.url;
+        }) : [];
+        var patchReferences = references.filter(function(reference) {
+            return Array.isArray(reference.tags) && reference.tags.some(function(tag) {
+                return String(tag).trim().toLowerCase() === 'patch';
+            });
+        });
+        var otherReferences = references.filter(function(reference) {
+            return !patchReferences.includes(reference);
+        });
+
+        function appendReferenceGroup(title, groupReferences, isPatchGroup) {
+            if (!groupReferences.length) return;
+            var groupHeading = document.createElement('h4');
+            groupHeading.textContent = title;
+            panel.appendChild(groupHeading);
+            var referenceList = document.createElement('ul');
+            referenceList.className = isPatchGroup ? 'guidance-links patch-reference-group' : 'guidance-links';
+            groupReferences.forEach(function(reference) {
+                var item = document.createElement('li');
+                var tags = Array.isArray(reference.tags) ? reference.tags.join(', ') : '';
+                var label = isPatchGroup ? 'Patch reference' : (tags ? 'Reference (' + tags + ')' : 'NVD reference');
+                if (reference.source) label += ' · ' + reference.source;
+                if (appendExternalLink(item, reference.url, label)) referenceList.appendChild(item);
+            });
+            if (referenceList.childElementCount) panel.appendChild(referenceList);
+        }
+
+        if (patchReferences.length) {
+            appendReferenceGroup('NVD references tagged Patch', patchReferences, true);
+        } else if (references.length) {
+            var noPatchReferences = document.createElement('p');
+            noPatchReferences.className = 'guidance-note';
+            noPatchReferences.textContent = 'No NVD reference is tagged Patch for this CVE. Other NVD references are listed below.';
+            panel.appendChild(noPatchReferences);
+        }
+        appendReferenceGroup('Other NVD references', otherReferences, false);
+
+        if (!references.length) {
+            var noReferences = document.createElement('p');
+            noReferences.className = 'guidance-note';
+            noReferences.textContent = 'Reference links are not bundled in this snapshot. Open the NVD record below to review current advisories, solutions, and tools.';
+            panel.appendChild(noReferences);
+        }
+
+        var nvdLink = document.createElement('p');
+        appendExternalLink(nvdLink, 'https://nvd.nist.gov/vuln/detail/' + encodeURIComponent(row.CVE || ''), 'Open this CVE in NVD');
+        panel.appendChild(nvdLink);
+        var applicability = document.createElement('p');
+        applicability.className = 'guidance-note';
+        applicability.textContent = 'Confirm that the affected product and version match your environment. This dataset does not determine installed versions or guarantee that a specific update applies.';
+        panel.appendChild(applicability);
+
+        detailsCell.appendChild(panel);
+        detailsRow.appendChild(detailsCell);
+        return detailsRow;
+    }
+
     function sortData(column, direction) {
         currentSort = { column: column, direction: direction };
-
         filteredData.sort(function(a, b) {
             var aVal = getSortValue(a, column);
             var bVal = getSortValue(b, column);
-
             if (column === 'CVSS Score' || column === 'EPSS') {
                 aVal = parseFloat(aVal) || 0;
                 bVal = parseFloat(bVal) || 0;
-            } else if (column === 'Published') {
-                aVal = new Date(aVal);
-                bVal = new Date(bVal);
-                if (isNaN(aVal.getTime())) aVal = new Date(0);
-                if (isNaN(bVal.getTime())) bVal = new Date(0);
             } else {
                 aVal = aVal.toString().toLowerCase();
                 bVal = bVal.toString().toLowerCase();
             }
-
-            var cmp = 0;
-            if (aVal < bVal) cmp = -1;
-            else if (aVal > bVal) cmp = 1;
-
-            return direction === 'desc' ? -cmp : cmp;
+            return (aVal < bVal ? -1 : aVal > bVal ? 1 : 0) * (direction === 'desc' ? -1 : 1);
         });
-
         currentPage = 1;
         renderPage(filteredData, currentPage);
+        updateSortIndicators();
     }
 
     function updateSortIndicators() {
         document.querySelectorAll('.data-table th[data-column]').forEach(function(th) {
-            if (th.dataset.column === currentSort.column) {
-                th.setAttribute('aria-sort', currentSort.direction === 'asc' ? 'ascending' : 'descending');
-            } else {
-                th.setAttribute('aria-sort', 'none');
-            }
+            th.setAttribute('aria-sort', th.dataset.column === currentSort.column
+                ? (currentSort.direction === 'asc' ? 'ascending' : 'descending')
+                : 'none');
         });
     }
 
     function handleSort(column) {
-        var direction = 'asc';
-        if (currentSort.column === column) {
-            direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-        }
+        var direction = currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc';
         sortData(column, direction);
-        updateSortIndicators();
     }
 
-    /* ── Pagination ── */
+    function getSeverity(scoreValue) {
+        var score = parseFloat(scoreValue);
+        if (!Number.isFinite(score) || score <= 0) return 'Unknown';
+        if (score >= 9) return 'Critical';
+        if (score >= 7) return 'High';
+        if (score >= 4) return 'Medium';
+        return 'Low';
+    }
+
+    function filterData() {
+        var term = document.getElementById('searchInput').value.trim().toLowerCase();
+        var severity = document.getElementById('severityFilter').value;
+        var source = document.getElementById('sourceFilter').value;
+        var vendorTerm = document.getElementById('vendorFilter').value.trim().toLowerCase();
+        filteredData = allData.filter(function(row) {
+            var matchesTerm = !term || Object.values(row).some(function(value) {
+                return String(value || '').toLowerCase().includes(term);
+            });
+            var matchesSeverity = !severity || getSeverity(row['CVSS Score']) === severity;
+            var sources = (row.Source || '').split('/').map(function(value) { return value.trim(); });
+            var matchesSource = !source || sources.includes(source);
+            var productVendor = ((row.Vendor || '') + ' ' + (row['Affected Products'] || '')).toLowerCase();
+            return matchesTerm && matchesSeverity && matchesSource && (!vendorTerm || productVendor.includes(vendorTerm));
+        });
+        currentPage = 1;
+        sortData(currentSort.column, currentSort.direction);
+    }
+
     function renderPage(data, page) {
-        var start = (page - 1) * ROWS_PER_PAGE;
-        var end = start + ROWS_PER_PAGE;
-        var pageData = data.slice(start, end);
+        var totalPages = Math.max(1, Math.ceil(data.length / ROWS_PER_PAGE));
+        currentPage = Math.max(1, Math.min(page, totalPages));
+        var start = (currentPage - 1) * ROWS_PER_PAGE;
+        var pageData = data.slice(start, start + ROWS_PER_PAGE);
         renderTableRows(pageData);
-        renderPaginationControls(data.length, page);
+        renderPaginationControls(data.length, currentPage);
+        document.getElementById('downloadFiltered').disabled = data.length === 0;
+        var range = data.length ? (start + 1) + '-' + Math.min(start + ROWS_PER_PAGE, data.length) : '0';
+        document.getElementById('resultStatus').textContent = data.length
+            ? 'Showing ' + range + ' of ' + data.length.toLocaleString() + ' matching vulnerabilities.'
+            : 'No vulnerabilities match these filters.';
+    }
+
+    function changePage(page) {
+        renderPage(filteredData, page);
+        var currentButton = document.querySelector('#paginationControls [aria-current="page"]');
+        if (currentButton) currentButton.focus();
+        else document.getElementById('paginationControls').focus();
     }
 
     function renderTableRows(rows) {
         var tbody = document.getElementById('tableBody');
-        // Clear all child nodes safely
-        while (tbody.firstChild) { tbody.removeChild(tbody.firstChild); }
+        while (tbody.firstChild) tbody.removeChild(tbody.firstChild);
+        openDetailRefreshers = [];
+        if (!rows.length) {
+            var emptyRow = document.createElement('tr');
+            var emptyCell = document.createElement('td');
+            emptyCell.colSpan = 6;
+            emptyCell.className = 'empty-results';
+            emptyCell.textContent = 'Try changing or resetting your filters.';
+            emptyRow.appendChild(emptyCell);
+            tbody.appendChild(emptyRow);
+            return;
+        }
 
-        rows.forEach(function(row) {
+        rows.forEach(function(row, index) {
             var tr = document.createElement('tr');
-
-            // CVE
             var cveTd = document.createElement('td');
             cveTd.className = 'cve-cell';
-            cveTd.textContent = row.CVE || '';
+            appendExternalLink(cveTd, 'https://nvd.nist.gov/vuln/detail/' + encodeURIComponent(row.CVE || ''), row.CVE || 'Unknown CVE');
             tr.appendChild(cveTd);
 
-            // CVSS Score with severity label (text + color, not color-only)
             var scoreTd = document.createElement('td');
             scoreTd.className = 'score-cell';
             var score = parseFloat(row['CVSS Score'] || '0');
-            if (score > 0) {
-                var severityClass, severityText;
-                if (score >= 9.0) { severityClass = 'severity-critical'; severityText = 'Critical'; }
-                else if (score >= 7.0) { severityClass = 'severity-high'; severityText = 'High'; }
-                else if (score >= 4.0) { severityClass = 'severity-medium'; severityText = 'Medium'; }
-                else { severityClass = 'severity-low'; severityText = 'Low'; }
+            var severity = getSeverity(row['CVSS Score']);
+            if (severity !== 'Unknown') {
+                var severityClass = 'severity-' + severity.toLowerCase();
                 scoreTd.classList.add(severityClass);
-
-                var scoreText = document.createTextNode(score.toFixed(1) + ' ');
-                scoreTd.appendChild(scoreText);
-
+                scoreTd.appendChild(document.createTextNode(score.toFixed(1) + ' '));
                 var labelSpan = document.createElement('span');
                 labelSpan.className = 'severity-label ' + severityClass;
-                labelSpan.textContent = severityText;
+                labelSpan.textContent = severity;
                 scoreTd.appendChild(labelSpan);
             } else {
                 scoreTd.textContent = 'N/A';
             }
             tr.appendChild(scoreTd);
 
-            // EPSS
             var epssTd = document.createElement('td');
             epssTd.className = 'epss-cell';
-            var epss = parseFloat(row.EPSS || '0');
-            epssTd.textContent = epss > 0 ? epss.toFixed(3) : 'N/A';
+            var epss = parseFloat(row.EPSS);
+            epssTd.textContent = Number.isFinite(epss) ? epss.toFixed(3) : 'N/A';
             tr.appendChild(epssTd);
 
-            // Vendor / Product
             var productTd = document.createElement('td');
             productTd.className = 'product-cell';
-
             var productName = document.createElement('span');
             productName.className = 'product-name';
-            productName.textContent = row['Affected Products'] || 'Unknown Product';
+            var cpeScope = getCPEConfigurationSummary(row);
+            productName.textContent = cpeScope.count > 1
+                ? cpeScope.count.toLocaleString() + ' NVD configurations across ' + cpeScope.vendorCount.toLocaleString() + ' vendors'
+                : (row['Affected Products'] || 'Product unavailable');
             productTd.appendChild(productName);
-
             var productVendor = document.createElement('span');
             productVendor.className = 'product-vendor';
-            productVendor.textContent = row['Vendor'] ? 'Vendor: ' + row['Vendor'] : 'Vendor unavailable';
+            productVendor.textContent = cpeScope.count > 1
+                ? 'Example match: ' + (row.Vendor || 'vendor unavailable') + ' / ' + (row['Affected Products'] || 'product unavailable')
+                : (row.Vendor ? 'Vendor: ' + row.Vendor : 'Vendor unavailable');
             productTd.appendChild(productVendor);
-
             tr.appendChild(productTd);
 
-            // Source
             var sourceTd = document.createElement('td');
-            var sources = (row.Source || '').split('/');
-            sources.forEach(function(source) {
-                if (source.trim()) {
-                    var span = document.createElement('span');
-                    span.className = 'source-badge';
-                    span.textContent = source.trim();
-                    sourceTd.appendChild(span);
-                }
+            (row.Source || '').split('/').forEach(function(source) {
+                if (!source.trim()) return;
+                var span = document.createElement('span');
+                span.className = 'source-badge';
+                span.textContent = source.trim();
+                sourceTd.appendChild(span);
             });
             tr.appendChild(sourceTd);
 
+            var detailTd = document.createElement('td');
+            var detailId = 'details-' + currentPage + '-' + index;
+            var detailButton = document.createElement('button');
+            detailButton.type = 'button';
+            detailButton.className = 'row-details-toggle';
+            detailButton.textContent = 'View details';
+            detailButton.setAttribute('aria-expanded', 'false');
+            detailButton.setAttribute('aria-controls', detailId);
+            detailTd.appendChild(detailButton);
+            tr.appendChild(detailTd);
+
+            var detailsRow = createRowDetails(row, detailId);
+            detailButton.addEventListener('click', function() {
+                var expanded = detailButton.getAttribute('aria-expanded') === 'true';
+                detailButton.setAttribute('aria-expanded', String(!expanded));
+                detailButton.textContent = expanded ? 'View details' : 'Hide details';
+                detailsRow.hidden = expanded;
+            });
+            openDetailRefreshers.push(function() {
+                if (detailsRow.hidden || !detailsRow.parentNode) return;
+                var refreshedDetails = createRowDetails(row, detailId);
+                refreshedDetails.hidden = false;
+                detailsRow.parentNode.replaceChild(refreshedDetails, detailsRow);
+                detailsRow = refreshedDetails;
+            });
             tbody.appendChild(tr);
+            tbody.appendChild(detailsRow);
         });
     }
 
     function renderPaginationControls(totalRows, page) {
         var container = document.getElementById('paginationControls');
-        // Clear safely
-        while (container.firstChild) { container.removeChild(container.firstChild); }
-
+        while (container.firstChild) container.removeChild(container.firstChild);
         var totalPages = Math.ceil(totalRows / ROWS_PER_PAGE);
-        if (totalPages <= 1) {
-            var infoOnly = document.createElement('span');
-            infoOnly.className = 'pagination-info';
-            infoOnly.textContent = 'Showing ' + totalRows + ' of ' + totalRows + ' results';
-            container.appendChild(infoOnly);
-            return;
-        }
+        if (totalPages <= 1) return;
 
-        // Info text
-        var start = (page - 1) * ROWS_PER_PAGE + 1;
-        var end = Math.min(page * ROWS_PER_PAGE, totalRows);
-        var info = document.createElement('span');
-        info.className = 'pagination-info';
-        info.textContent = 'Showing ' + start + '-' + end + ' of ' + totalRows.toLocaleString();
-        container.appendChild(info);
-
-        // Previous button
-        var prevBtn = document.createElement('button');
-        prevBtn.textContent = 'Previous';
-        prevBtn.disabled = page === 1;
-        prevBtn.addEventListener('click', function() { currentPage--; renderPage(filteredData, currentPage); });
-        container.appendChild(prevBtn);
-
-        // Page number buttons (show max 7 pages with ellipsis)
-        var maxButtons = 7;
-        var startPage = Math.max(1, page - Math.floor(maxButtons / 2));
-        var endPage = Math.min(totalPages, startPage + maxButtons - 1);
-        if (endPage - startPage < maxButtons - 1) {
-            startPage = Math.max(1, endPage - maxButtons + 1);
-        }
-
-        if (startPage > 1) {
-            var firstBtn = document.createElement('button');
-            firstBtn.textContent = '1';
-            firstBtn.addEventListener('click', function() { currentPage = 1; renderPage(filteredData, currentPage); });
-            container.appendChild(firstBtn);
-            if (startPage > 2) {
-                var ellipsis1 = document.createElement('span');
-                ellipsis1.className = 'pagination-info';
-                ellipsis1.textContent = '...';
-                container.appendChild(ellipsis1);
+        function addPageButton(label, targetPage, isCurrent) {
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = label;
+            if (isCurrent) {
+                button.className = 'active';
+                button.setAttribute('aria-current', 'page');
             }
+            button.addEventListener('click', function() { changePage(targetPage); });
+            container.appendChild(button);
         }
 
-        for (var i = startPage; i <= endPage; i++) {
-            (function(pageNum) {
-                var btn = document.createElement('button');
-                btn.textContent = pageNum;
-                if (pageNum === page) btn.classList.add('active');
-                btn.addEventListener('click', function() { currentPage = pageNum; renderPage(filteredData, currentPage); });
-                container.appendChild(btn);
-            })(i);
+        var previous = document.createElement('button');
+        previous.type = 'button';
+        previous.textContent = 'Previous';
+        previous.disabled = page === 1;
+        previous.addEventListener('click', function() { changePage(page - 1); });
+        container.appendChild(previous);
+        var startPage = Math.max(1, Math.min(page - 3, totalPages - 6));
+        var endPage = Math.min(totalPages, startPage + 6);
+        if (startPage > 1) container.appendChild(document.createTextNode('...'));
+        for (var pageNumber = startPage; pageNumber <= endPage; pageNumber++) {
+            addPageButton(String(pageNumber), pageNumber, pageNumber === page);
         }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                var ellipsis2 = document.createElement('span');
-                ellipsis2.className = 'pagination-info';
-                ellipsis2.textContent = '...';
-                container.appendChild(ellipsis2);
-            }
-            var lastBtn = document.createElement('button');
-            lastBtn.textContent = totalPages;
-            lastBtn.addEventListener('click', function() { currentPage = totalPages; renderPage(filteredData, currentPage); });
-            container.appendChild(lastBtn);
-        }
-
-        // Next button
-        var nextBtn = document.createElement('button');
-        nextBtn.textContent = 'Next';
-        nextBtn.disabled = page === totalPages;
-        nextBtn.addEventListener('click', function() { currentPage++; renderPage(filteredData, currentPage); });
-        container.appendChild(nextBtn);
+        if (endPage < totalPages) container.appendChild(document.createTextNode('...'));
+        var next = document.createElement('button');
+        next.type = 'button';
+        next.textContent = 'Next';
+        next.disabled = page === totalPages;
+        next.addEventListener('click', function() { changePage(page + 1); });
+        container.appendChild(next);
     }
 
-    /* ── Search ── */
-    function filterData(searchTerm) {
-        if (!searchTerm) {
-            filteredData = allData.slice();
-        } else {
-            var term = searchTerm.toLowerCase();
-            filteredData = allData.filter(function(row) {
-                return Object.values(row).some(function(value) {
-                    return value.toString().toLowerCase().includes(term);
-                });
-            });
-        }
-        currentPage = 1;
-        sortData(currentSort.column, currentSort.direction);
+    function downloadFilteredCSV() {
+        if (!filteredData.length) return;
+        var blob = new Blob([Papa.unparse(filteredData)], { type: 'text/csv;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = 'patchthisapp-filtered.csv';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('severityFilter').value = '';
+        document.getElementById('sourceFilter').value = '';
+        document.getElementById('vendorFilter').value = '';
+        filterData();
+        document.getElementById('searchInput').focus();
     }
 
     /* ── Overview Statistics Panel ── */
@@ -1641,14 +1923,19 @@
        Event Listeners & Init
        ═══════════════════════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', function() {
-        // Search
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            filterData(e.target.value);
+        document.getElementById('searchInput').addEventListener('input', filterData);
+        document.getElementById('vendorFilter').addEventListener('input', filterData);
+        document.getElementById('severityFilter').addEventListener('change', filterData);
+        document.getElementById('sourceFilter').addEventListener('change', filterData);
+        document.getElementById('resetFilters').addEventListener('click', resetFilters);
+        document.getElementById('downloadFiltered').addEventListener('click', downloadFilteredCSV);
+        document.getElementById('pageSizeSelect').addEventListener('change', function(event) {
+            ROWS_PER_PAGE = Number(event.target.value) || 50;
+            renderPage(filteredData, 1);
         });
 
-        // Sortable headers
         document.querySelectorAll('.data-table th[data-column]').forEach(function(th) {
-            th.addEventListener('click', function() { handleSort(th.dataset.column); });
+            th.querySelector('.sort-button').addEventListener('click', function() { handleSort(th.dataset.column); });
         });
 
         // Load data

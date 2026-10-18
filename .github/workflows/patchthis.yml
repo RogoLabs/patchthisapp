@@ -134,6 +134,74 @@ jobs:
         echo "- **CVEs processed:** $ROW_COUNT" >> $GITHUB_STEP_SUMMARY
         echo "- **Run time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
 
+    - name: Audit remediation guidance coverage
+      run: |
+          python - <<'PY'
+          import csv
+          import json
+          import os
+          from datetime import datetime
+          from pathlib import Path
+
+          csv_path = Path('web/data.csv')
+          guidance_path = Path('web/cve-guidance.json')
+          if not guidance_path.is_file():
+              raise SystemExit('ERROR: web/cve-guidance.json was not generated')
+
+          with csv_path.open(newline='', encoding='utf-8') as csv_file:
+              rows = list(csv.DictReader(csv_file))
+          with guidance_path.open(encoding='utf-8') as guidance_file:
+              guidance = json.load(guidance_file)
+
+          generated_at = guidance.get('generated_at_utc', '')
+          try:
+              timestamp = datetime.fromisoformat(generated_at.replace('Z', '+00:00'))
+          except ValueError as error:
+              raise SystemExit(f'ERROR: invalid guidance timestamp: {generated_at}') from error
+          if timestamp.tzinfo is None:
+              raise SystemExit('ERROR: guidance timestamp must include a UTC offset')
+          if timestamp.utcoffset().total_seconds() != 0:
+              raise SystemExit('ERROR: guidance timestamp must be in UTC')
+
+          cves = guidance.get('cves', {})
+          if not isinstance(cves, dict):
+              raise SystemExit('ERROR: guidance cves field must be an object')
+          dataset_cves = {row['CVE'] for row in rows}
+          orphaned_cves = set(cves) - dataset_cves
+          if orphaned_cves:
+              raise SystemExit(f'ERROR: guidance contains {len(orphaned_cves)} CVEs absent from web/data.csv')
+
+          kev_cves = {row['CVE'] for row in rows if 'CISA' in row.get('Source', '').split('/')}
+          kev_actions = sum(bool((cves.get(cve, {}).get('kev') or {}).get('required_action')) for cve in kev_cves)
+          kev_due_dates = sum(bool((cves.get(cve, {}).get('kev') or {}).get('due_date')) for cve in kev_cves)
+          patch_references = [
+              reference
+              for entry in cves.values()
+              for reference in entry.get('nvd_references', [])
+              if reference.get('url') and any(str(tag).strip().lower() == 'patch' for tag in reference.get('tags', []))
+          ]
+          patch_reference_cves = {
+              cve for cve, entry in cves.items()
+              if any(
+                  reference.get('url') and any(str(tag).strip().lower() == 'patch' for tag in reference.get('tags', []))
+                  for reference in entry.get('nvd_references', [])
+              )
+          }
+
+          summary = [
+              '### Remediation guidance coverage',
+              f'- **KEV entries in dataset:** {len(kev_cves)}',
+              f'- **KEV required actions bundled:** {kev_actions}/{len(kev_cves)}',
+              f'- **KEV due dates bundled:** {kev_due_dates}/{len(kev_cves)}',
+              f'- **CVEs with NVD Patch references:** {len(patch_reference_cves)}',
+              f'- **NVD Patch references:** {len(patch_references)}',
+              f'- **Guidance generated (UTC):** {generated_at}',
+          ]
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary_file:
+              summary_file.write('\n'.join(summary) + '\n')
+          print('\n'.join(summary))
+          PY
+
     - name: Commit changes
       uses: EndBug/add-and-commit@v11
       with:

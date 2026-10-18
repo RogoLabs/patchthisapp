@@ -549,9 +549,18 @@ html.dark .app-error {
    ═══════════════════════════════════════════════════════ */
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
   gap: 2rem;
   margin-bottom: 3rem;
+
+.chart-card {
+  min-width: 0;
+}
+
+.chart-container,
+.chart-container canvas {
+  max-width: 100%;
+}
 }
 
 .chart-card {
@@ -615,6 +624,221 @@ html.dark .app-error {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.explorer-header {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.explorer-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) minmax(120px, 0.8fr) minmax(130px, 0.9fr) minmax(170px, 1.3fr) minmax(120px, 0.7fr) auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.filter-field {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.filter-field input,
+.filter-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.explorer-filters .search-box {
+  min-width: 0;
+  width: 100%;
+}
+
+.filter-reset {
+  min-height: 42px;
+  white-space: nowrap;
+}
+
+.explorer-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.explorer-downloads a,
+.explorer-downloads button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.data-freshness,
+.result-status {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.methodology-note,
+.guidance-note {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.methodology-note {
+  border-left: 3px solid var(--primary);
+  padding: 0.65rem 0.85rem;
+  margin: 0 0 1rem;
+  background: var(--surface-alt);
+}
+
+.table-scroll-hint {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.data-table {
+  min-width: 900px;
+}
+
+.data-table th {
+  cursor: default;
+}
+
+.sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sort-button:hover {
+  color: var(--primary-dark);
+}
+
+.row-details-toggle {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.row-details-toggle:hover {
+  border-color: var(--primary);
+}
+
+.row-detail-panel {
+  padding: 1rem;
+  background: var(--surface-alt);
+  color: var(--text-primary);
+  white-space: normal;
+}
+
+.row-detail-panel h3,
+.row-detail-panel h4 {
+  margin: 0.25rem 0 0.75rem;
+}
+
+.row-detail-panel h4 {
+  margin-top: 1.25rem;
+}
+
+.row-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 0;
+}
+
+.row-detail-grid dt {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.row-detail-grid dd {
+  margin: 0.2rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.guidance-links {
+  display: grid;
+  gap: 0.45rem;
+  padding-left: 1.25rem;
+  overflow-wrap: anywhere;
+}
+
+.patch-reference-group {
+  border-left: 3px solid var(--success-alt);
+  padding-left: 1rem;
+  font-weight: 600;
+}
+
+.empty-results {
+  padding: 2rem !important;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.chart-data-summary {
+  margin: 0.75rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 2000;
+  padding: 0.6rem 0.9rem;
+  transform: translateY(-160%);
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 2px solid var(--primary);
+  border-radius: var(--border-radius-sm);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
+main [id] {
+  scroll-margin-top: 72px;
 }
 
 html.dark .search-box:focus {
@@ -1134,6 +1358,23 @@ html.dark .badge-low {
    Responsive: Tablet (768px)
    ═══════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
+  .explorer-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .search-field,
+  .vendor-field {
+    grid-column: 1 / -1;
+  }
+
+  .filter-reset {
+    justify-self: start;
+  }
+
+  .explorer-downloads {
+    justify-content: flex-start;
+  }
+
   .hero-title {
     font-size: 2rem;
   }
@@ -1162,7 +1403,7 @@ html.dark .badge-low {
   }
 
   .charts-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .stat-value {
@@ -1218,6 +1459,24 @@ html.dark .badge-low {
    Responsive: Small Mobile (480px)
    ═══════════════════════════════════════════════════════ */
 @media (max-width: 480px) {
+  .explorer-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .search-field,
+  .vendor-field {
+    grid-column: auto;
+  }
+
+  .explorer-downloads a,
+  .explorer-downloads button {
+    width: 100%;
+  }
+
+  .row-detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .hero-title {
     font-size: 1.75rem;
   }
@@ -1261,14 +1520,17 @@ html.dark .badge-low {
   }
 
   .nav-container {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
     padding: 0.5rem;
   }
 
   .nav-link {
+    flex: 0 0 auto;
     text-align: center;
-    padding: 0.5rem;
+    padding: 0.5rem 0.6rem;
   }
 
   .nav-spacer {
@@ -1276,9 +1538,8 @@ html.dark .badge-low {
   }
 
   .dark-toggle {
-    align-self: center;
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem;
+    flex: 0 0 auto;
+    margin: 0.25rem 0;
   }
 
   .pagination {
@@ -1289,5 +1550,17 @@ html.dark .badge-low {
   .pagination button {
     padding: 0.35rem 0.6rem;
     font-size: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

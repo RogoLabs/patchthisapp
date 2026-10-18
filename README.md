@@ -23,8 +23,8 @@ PatchThisApp transforms vulnerability management by providing **actionable intel
 
 ### Key Features
 
-- **Intelligent Prioritization**: ML-driven scoring and analysis to focus on the most critical threats
-- **Real-time Intelligence**: Continuous monitoring and updates from trusted security sources
+- **Vulnerability Prioritization**: Combines source membership with CVSS severity and EPSS probability to help focus review
+- **Scheduled Intelligence**: Publishes a static data snapshot on a six-hour workflow schedule; upstream feed updates may differ
 - **Modern Web Interface**: Single-page application with dashboard analytics, data explorer, and dark mode
 - **CSV Data Export**: Generated vulnerability dataset for integration into your workflows
 - **Enterprise Ready**: Professional interface suitable for executive reporting
@@ -146,15 +146,19 @@ The web interface is a single-page application built with vanilla HTML, CSS, and
 
 - **Hero**: Overview of the platform with key statistics and call-to-action links
 - **Dashboard**: Vulnerability analytics with Chart.js visualizations including timeline trends, source distribution, CVSS score breakdown, attack vector analysis, EPSS distribution, and top affected products
-- **Data Explorer**: Full data table with search filtering, sortable columns, and pagination for browsing the complete vulnerability dataset
+- **Data Explorer**: Full data table with all-field search, severity/source/vendor-product filters, sortable columns, configurable page sizes, and pagination
+- **CVE Details**: Per-vulnerability descriptions, product criteria, CISA KEV actions/dates where available, and source-attributed NVD reference links
 - **Sources**: Intelligence source details and attribution
 
 Additional features:
 - **Dark mode toggle** for comfortable viewing in any environment
 - **Pagination** with configurable page sizes for navigating large datasets
-- **Real-time search** to instantly filter vulnerabilities by any field
+- **Filtered and full CSV downloads** for carrying a search result into another workflow
+- **Scheduled snapshot freshness** when generation metadata is available
 - **Chart.js visualizations** for at-a-glance trend and distribution analysis
 - **Responsive design** that works on desktop, tablet, and mobile
+
+Patch guidance is evidence, not an asset-specific recommendation. CISA KEV action text and dates are shown as catalog data; NVD references are links to review, not confirmed fixed versions. The dataset does not know which product versions are installed in your environment, so verify applicability and the current fix with the vendor.
 
 ### CSV Data Format
 
