@@ -424,7 +424,7 @@ def main() -> None:
     logger.info("Merging data and writing output...")
     patchthisapp_df = pd.merge(cve_list, nvd, how='inner', left_on='CVE', right_on='CVE')
 
-    generated_at = datetime.now(timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')
+    generated_at = datetime.now(timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')  # noqa: UP017
     guidance_by_cve = {}
     for _, row in patchthisapp_df.iterrows():
         references = row.get('nvd_references', [])
