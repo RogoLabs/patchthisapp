@@ -202,14 +202,11 @@ jobs:
           print('\n'.join(summary))
           PY
 
-    - name: Stage generated data artifacts
-      run: git add -f -- data/data.csv web/data.csv web/cve-guidance.json
-
     - name: Commit changes
       uses: EndBug/add-and-commit@v11
       with:
           default_author: github_actions
-          add: 'data/data.csv web/data.csv web/cve-guidance.json'
+          add: 'data/data.csv web/data.csv web/cve-guidance.json --force'
           message: 'Update vulnerability data - ${{ github.event.head_commit.timestamp }}'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
