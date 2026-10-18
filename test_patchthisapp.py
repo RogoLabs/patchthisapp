@@ -165,17 +165,24 @@ class TestCSVOutputFormat:
     def workspace(self, tmp_path):
         """Create minimal input files for a full pipeline run."""
         # NVD data
-        entries = [_make_nvd_entry(), _make_nvd_entry(cve_id="CVE-2024-0002", cwe_id="CWE-89")]
+        entries = [
+            _make_nvd_entry(),
+            _make_nvd_entry(cve_id="CVE-2024-0002", cwe_id="CWE-89"),
+            _make_nvd_entry(cve_id="CVE-2024-0003", cwe_id="CWE-79"),
+        ]
         entries[0]["cve"]["references"] = [
             {"url": "https://vendor.example/advisory", "source": "vendor@example.com", "tags": ["Vendor Advisory"]},
             {"url": "https://vendor.example/patch", "source": "vendor@example.com", "tags": ["Patch"]},
+        ]
+        entries[2]["cve"]["references"] = [
+            {"url": "https://vendor.example/patch-only", "source": "vendor@example.com", "tags": ["Patch"]}
         ]
         nvd_path = tmp_path / "nvd.jsonl"
         nvd_path.write_text(json.dumps(entries))
 
         # Metasploit
         meta_path = tmp_path / "metasploit.txt"
-        meta_path.write_text("CVE-2024-0001\n")
+        meta_path.write_text("CVE-2024-0001\nCVE-2024-0003\n")
 
         # Nuclei
         nuclei_path = tmp_path / "nuclei.txt"
@@ -226,6 +233,8 @@ class TestCSVOutputFormat:
         df = pd.read_csv(workspace["output"])
         assert list(df.columns) == EXPECTED_COLUMNS_WITH_EPSS
         guidance = json.loads((workspace["tmp_path"] / "web" / "cve-guidance.json").read_text())
+        assert "CVE-2024-0003" not in set(df["CVE"])
+        assert "CVE-2024-0003" not in guidance["cves"]
         assert guidance["generated_at_utc"].endswith("Z")
         assert guidance["cves"]["CVE-2024-0001"]["kev"] == {
             "required_action": "Apply vendor updates",

@@ -468,6 +468,12 @@ def main() -> None:
             "cvss_vector": "CVSS_Vector", "cwe": "CWE", "cpe": "CPE",
             "vendor": "Vendor", "product": "Affected Products"
         })
+
+    final_cves = set(patchthisapp_df['CVE'])
+    guidance_by_cve = {
+        cve: guidance for cve, guidance in guidance_by_cve.items()
+        if cve in final_cves
+    }
     
     logger.info(f"Final dataset: {len(patchthisapp_df)} CVEs")
     if args.dry_run:
